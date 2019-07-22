@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.mzule.fantasyslide:library:1.0.5@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.5.aar/e91ab769d82ca6d07a9c174fcb884270/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.5.aar/e91ab769d82ca6d07a9c174fcb884270/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.mzule.fantasyslide/library/1.0.5/ca5e3f82bab9c0fba0bd7a0840952e0fd0c41f52/library-1.0.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
