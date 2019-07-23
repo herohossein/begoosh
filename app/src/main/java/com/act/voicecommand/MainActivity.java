@@ -7,19 +7,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends BaseActivity {
@@ -31,6 +24,7 @@ public class MainActivity extends BaseActivity {
     public ImageView tutorialIv;
     public ImageView aboutIv;
     public ImageView supportIv;
+    public ImageView typeIv;
 
     SpeechRecognizer recognizer;
     CommandAction commandAction;
@@ -96,6 +90,14 @@ public class MainActivity extends BaseActivity {
                 startActivity(i);
             }
         });
+        typeIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     public void init() {
@@ -103,6 +105,7 @@ public class MainActivity extends BaseActivity {
         tutorialIv = findViewById(R.id.tutorial_iv);
         aboutIv = findViewById(R.id.about_iv);
         supportIv = findViewById(R.id.support_iv);
+        typeIv = findViewById(R.id.type_iv);
     }
 
 
