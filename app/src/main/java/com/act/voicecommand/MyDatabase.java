@@ -6,17 +6,19 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class MyDatabase extends SQLiteAssetHelper {
 
-private static final String DATABASE_NAME = "dictionary.db";
-public static int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME1 = "Dictionary.db";
+    public static int DATABASE_VERSION = 1;
 
-public MyDatabase (Context context) {
-super(context, DATABASE_NAME, null, DATABASE_VERSION);
-setForcedUpgrade();
-}
-public void setDB_version(int vr){
-	DATABASE_VERSION=vr;
-}
-public int getDB_version(){
-	return DATABASE_VERSION;
-}
+    public MyDatabase(Context context) {
+        super(context, DATABASE_NAME1, null, DATABASE_VERSION);
+        setForcedUpgrade();
+    }
+
+    public void setDB_version(int vr) {
+        DATABASE_VERSION = vr;
+    }
+
+    public int getDB_version() {
+        return DATABASE_VERSION;
+    }
 }
