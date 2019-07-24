@@ -4,13 +4,19 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -26,6 +32,9 @@ public class MainActivity extends BaseActivity {
     public ImageView supportIv;
     public ImageView typeIv;
 
+    SharedPreferences prefs = null;
+
+
     SpeechRecognizer recognizer;
     CommandAction commandAction;
 
@@ -37,14 +46,6 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         this.setFinishOnTouchOutside(false);
         init();
-        MyDatabase myDatabase = new MyDatabase(this);
-//        typeBtn = findViewById(R.id.typebtn);
-//        PushDownAnim.setPushDownAnimTo(typeBtn)
-//                .setScale(MODE_APPEND, PushDownAnim.DEFAULT_PUSH_SCALE)
-//                .setDurationPush(PushDownAnim.DEFAULT_PUSH_DURATION)
-//                .setDurationRelease(PushDownAnim.DEFAULT_RELEASE_DURATION)
-//                .setInterpolatorPush(PushDownAnim.DEFAULT_INTERPOLATOR)
-//                .setInterpolatorRelease(PushDownAnim.DEFAULT_INTERPOLATOR);
 
         recognizer = SpeechRecognizer.createSpeechRecognizer(this);
         if (needPermissions(this)) {
@@ -104,12 +105,36 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (prefs.getBoolean("firstrun", true)) {
+
+            SQLiteDatabase sqLiteDatabase = null;
+            ContentValues cv = null;
+
+            Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.HAS_PHONE_NUMBER},
+                    null, null, null);
+            assert cursor != null;
+            while (cursor.moveToNext()) {
+                if (cursor.getInt(1) > 0)
+                    cv.put("name", cursor.getString(0));
+                sqLiteDatabase.insert("contacts", null, cv);
+            }
+            cursor.close();
+
+            prefs.edit().putBoolean("firstrun", false).apply();
+        }
+    }
+
     public void init() {
         voiceBtn = findViewById(R.id.voicebtn);
         tutorialIv = findViewById(R.id.tutorial_iv);
         aboutIv = findViewById(R.id.about_iv);
         supportIv = findViewById(R.id.support_iv);
         typeIv = findViewById(R.id.type_iv);
+        prefs = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
     }
 
 
@@ -119,7 +144,7 @@ public class MainActivity extends BaseActivity {
 //            Log.d("tag", "onClick: OK");
 //        startVoiceRecognitionActivity();
             mainCounter--;
-            if (mainCounter==97){
+            if (mainCounter == 97) {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("یه پیشنهاد جالب!");
                 alertDialog.setMessage("می\u200Cدونستی که می\u200Cتونی همین الان ویجت «به\u200Cگوش» رو روی صفحه اصلی گوشیت بذاری تا سریع و آسون بهش دسترسی داشته باشی؟");
