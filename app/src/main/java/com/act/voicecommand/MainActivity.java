@@ -68,6 +68,7 @@ public class MainActivity extends BaseActivity {
 
                 Intent i = new Intent(getApplicationContext(), TutorialActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
             }
         });
@@ -78,6 +79,7 @@ public class MainActivity extends BaseActivity {
 
                 Intent i = new Intent(getApplicationContext(), AboutActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
             }
         });
@@ -88,6 +90,7 @@ public class MainActivity extends BaseActivity {
 
                 Intent i = new Intent(getApplicationContext(), SupportActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
         typeIv.setOnClickListener(new View.OnClickListener() {
@@ -96,6 +99,7 @@ public class MainActivity extends BaseActivity {
 
                 Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
