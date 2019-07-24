@@ -6,17 +6,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +22,13 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
 
     public int mainCounter = 100;
-
+    private static final String TAG = "MainActivity";
     private static final int PERMISSIONS_REQUEST_ALL_PERMISSIONS = 1;
     public ImageView voiceBtn;
     public ImageView tutorialIv;
     public ImageView aboutIv;
     public ImageView supportIv;
+    public ImageView typeIv;
 
     SpeechRecognizer recognizer;
     CommandAction commandAction;
@@ -43,7 +41,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         this.setFinishOnTouchOutside(false);
         init();
-        MyDatabase myDatabase = new MyDatabase(this);
+
 //        typeBtn = findViewById(R.id.typebtn);
 //        PushDownAnim.setPushDownAnimTo(typeBtn)
 //                .setScale(MODE_APPEND, PushDownAnim.DEFAULT_PUSH_SCALE)
@@ -56,6 +54,7 @@ public class MainActivity extends BaseActivity {
         if (needPermissions(this)) {
             requestPermissions();
         } else {
+
 //            List<String> list = new ArrayList<>();
 //            list.add("تماس با مامان جون");
 //            commandAction = new CommandAction(this, list);
@@ -96,6 +95,14 @@ public class MainActivity extends BaseActivity {
                 startActivity(i);
             }
         });
+        typeIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), Speech2Text.class);
+                startActivity(i);
+            }
+        });
     }
 
     public void init() {
@@ -103,6 +110,7 @@ public class MainActivity extends BaseActivity {
         tutorialIv = findViewById(R.id.tutorial_iv);
         aboutIv = findViewById(R.id.about_iv);
         supportIv = findViewById(R.id.support_iv);
+        typeIv = findViewById(R.id.type_iv);
     }
 
 
@@ -150,6 +158,16 @@ public class MainActivity extends BaseActivity {
             alertDialog.show();
         }
 
+    }
+    public ArrayList<String> getAllAppName(){
+        List<PackageInfo> apps = getPackageManager().getInstalledPackages(0);
+
+        ArrayList<String> res = new ArrayList<>();
+        for(int i=0;i<apps.size();i++) {
+            PackageInfo p = apps.get(i);
+            res.add(p.applicationInfo.loadLabel(getPackageManager()).toString());
+        }
+        return res;
     }
 
     //    public void stopSpeech(View view) {
