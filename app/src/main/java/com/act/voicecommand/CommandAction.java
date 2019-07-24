@@ -122,7 +122,7 @@ public class CommandAction {
     }
 
     public ArrayList<String> checkContact(String contact) {
-        List<String> arrayContacts = getArrayOfContacts();
+        ArrayList<String> arrayContacts = getArrayOfContacts();
         String result = "";
 
         for (int i = 0; i < contact.length(); i++) {
@@ -190,10 +190,12 @@ public class CommandAction {
         //test
         ArrayList<String> icon = new ArrayList<>();
 
-        if (command.get(0).contains("تماس با")) {
-            String[] separated = command.get(0).split("با ");
-            foundedContact = findContact(separated[1]);
-            foundedContact.addAll(checkContact(separated[1]));
+        if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
+            if (command.get(0).contains("تماس با")) {
+                String[] separated = command.get(0).split("با ");
+                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated[1]);
+//                foundedContact.addAll(checkContact(separated[1]));
 //            for (int i = 0; i < foundedContact.size(); i++) {
 //                Log.d(TAG, "callCommand: " + foundedContact.get(i));
 //                Log.d(TAG, "callCommand: " + i);
@@ -204,28 +206,34 @@ public class CommandAction {
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated[1]));
 //            call(s);
-        } else if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
-            String[] separated1 = command.get(0).split("با ");
-            String[] separated2 = separated1[1].split(" تماس");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
+            } else {
+                String[] separated1 = command.get(0).split("با ");
+                String[] separated2 = separated1[1].split(" تماس");
+                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated2[0]);
+//                foundedContact.addAll(checkContact(separated2[0]));
 
+            }
 //            temp = separated2[0];
 //            s = getPhoneNumber(separated2[0]);
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated2[0]));
 //            call(s);
         } else if (command.get(0).contains("به") && command.get(0).contains("زنگ بزن")) {
-            String[] separated1 = command.get(0).split("به ");
-            String[] separated2 = separated1[1].split(" زنگ بزن");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
-//            temp = separated2[0];
-        } else if (command.get(0).contains("زنگ بزن به ")) {
-            String[] separated = command.get(0).split("به ");
-            foundedContact = findContact(separated[1]);
-            foundedContact.addAll(checkContact(separated[1]));
+            if (command.get(0).contains("زنگ بزن به ")) {
+                String[] separated = command.get(0).split("به ");
+//            foundedContact = findContact(separated[1]);
+//            foundedContact.addAll(checkContact(separated[1]));
+                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
 //            temp = separated[1];
+            } else {
+                String[] separated1 = command.get(0).split("به ");
+                String[] separated2 = separated1[1].split(" زنگ بزن");
+                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//            foundedContact = findContact(separated2[0]);
+//            foundedContact.addAll(checkContact(separated2[0]));
+//            temp = separated2[0];
+            }
         }
 
         if (foundedContact.size() > 0) {
@@ -264,8 +272,9 @@ public class CommandAction {
         if ((command.get(0).contains("پیامک") || command.get(0).contains("پیام")) && command.get(0).contains("بنویس")) {
             separated1 = command.get(0).split("به ");
             String[] separated2 = separated1[1].split(" بنویس ");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
+            foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//            foundedContact = findContact(separated2[0]);
+//            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
 //            s = getPhoneNumber(findContact(separated2[0]));
 //            if (s == null)
@@ -275,13 +284,15 @@ public class CommandAction {
 
         } else if (command.get(0).contains("پیامک") || command.get(0).contains("پیام")) {
             separated1 = command.get(0).split("به ");
-            if (separated1[1].length() > 20) {
-                foundedContact = findContact(separated1[1].substring(0, 20));
-                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
+            if (separated1[1].length() > 12) {
+                foundedContact = myCheckFunction(separated1[1].substring(0,12), getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated1[1].substring(0, 20));
+//                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
             } else {
                 Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
-                foundedContact = findContact(separated1[1].substring(0, 10));
-                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
+                foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated1[1].substring(0, 10));
+//                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
             }
         }
         //test
@@ -328,7 +339,6 @@ public class CommandAction {
                 addReminder(-1, -1, -1, dayOfWeek, text);
                 Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
             }
-
 
         }
         if (command.get(0).contains("یادم بیار که")) {
@@ -757,9 +767,9 @@ public class CommandAction {
                 + String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
     }
 
-    private List<String> getArrayOfContacts() {
+    private ArrayList<String> getArrayOfContacts() {
 
-        List<String> contacts = new ArrayList<>();
+        ArrayList<String> contacts = new ArrayList<>();
 
         Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.HAS_PHONE_NUMBER},
                 null, null, null);
