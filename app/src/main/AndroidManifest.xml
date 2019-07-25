@@ -38,7 +38,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Speech2Text" />
+        <activity android:name=".Speech2TextActivity" />
         <activity android:name=".TutorialActivity" />
         <activity
             android:name=".MyCustomDialogPrayer"

@@ -6,14 +6,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +45,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         this.setFinishOnTouchOutside(false);
         init();
-
+        MyDatabase myDatabase = new MyDatabase(this);
 //        typeBtn = findViewById(R.id.typebtn);
 //        PushDownAnim.setPushDownAnimTo(typeBtn)
 //                .setScale(MODE_APPEND, PushDownAnim.DEFAULT_PUSH_SCALE)
@@ -65,7 +69,6 @@ public class MainActivity extends BaseActivity {
         if (isFirstTime) {
 
         }
-
 
         tutorialIv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,10 +102,11 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent(getApplicationContext(), Speech2Text.class);
+                Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
                 startActivity(i);
             }
         });
+
     }
 
     public void init() {
@@ -116,6 +120,7 @@ public class MainActivity extends BaseActivity {
 
     public void onClick(View v) {
         // TODO Auto-generated method stub
+
         if (mainCounter <= 100 && mainCounter > 0) {
 //            Log.d("tag", "onClick: OK");
 //        startVoiceRecognitionActivity();
@@ -253,5 +258,20 @@ public class MainActivity extends BaseActivity {
 //        });
 //    }
 
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_HEADSETHOOK:
+            {
+                voiceBtn.performClick();
+                Log.d(TAG, "onKeyDown: " + "hi");
+                //your Action code
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 }

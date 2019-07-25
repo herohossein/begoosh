@@ -359,7 +359,7 @@ public class CommandAction {
 
             } else {
                 addReminder(-1, -1, -1, dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
             }
         }
         if (command.get(0).contains("امروز") && command.get(0).contains("یادآوری")) {

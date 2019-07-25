@@ -93,9 +93,9 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
             case "sunrise":
                 holder.iv.setBackgroundResource(R.drawable.sunrise);
                 break;
-            case "translate":
-                holder.iv.setBackgroundResource(R.drawable.translate);
-                break;
+//            case "translate":
+//                holder.iv.setBackgroundResource(R.drawable.translate);
+//                break;
         }
 
         holder.item.setOnClickListener(new View.OnClickListener() {
