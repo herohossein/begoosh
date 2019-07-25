@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -120,7 +122,7 @@ public class CommandAction {
     }
 
     public ArrayList<String> checkContact(String contact) {
-        List<String> arrayContacts = getArrayOfContacts();
+        ArrayList<String> arrayContacts = getArrayOfContacts();
         String result = "";
 
         for (int i = 0; i < contact.length(); i++) {
@@ -188,10 +190,12 @@ public class CommandAction {
         //test
         ArrayList<String> icon = new ArrayList<>();
 
-        if (command.get(0).contains("تماس با")) {
-            String[] separated = command.get(0).split("با ");
-            foundedContact = findContact(separated[1]);
-            foundedContact.addAll(checkContact(separated[1]));
+        if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
+            if (command.get(0).contains("تماس با")) {
+                String[] separated = command.get(0).split("با ");
+                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated[1]);
+//                foundedContact.addAll(checkContact(separated[1]));
 //            for (int i = 0; i < foundedContact.size(); i++) {
 //                Log.d(TAG, "callCommand: " + foundedContact.get(i));
 //                Log.d(TAG, "callCommand: " + i);
@@ -202,28 +206,34 @@ public class CommandAction {
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated[1]));
 //            call(s);
-        } else if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
-            String[] separated1 = command.get(0).split("با ");
-            String[] separated2 = separated1[1].split(" تماس");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
+            } else {
+                String[] separated1 = command.get(0).split("با ");
+                String[] separated2 = separated1[1].split(" تماس");
+                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated2[0]);
+//                foundedContact.addAll(checkContact(separated2[0]));
 
+            }
 //            temp = separated2[0];
 //            s = getPhoneNumber(separated2[0]);
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated2[0]));
 //            call(s);
         } else if (command.get(0).contains("به") && command.get(0).contains("زنگ بزن")) {
-            String[] separated1 = command.get(0).split("به ");
-            String[] separated2 = separated1[1].split(" زنگ بزن");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
-//            temp = separated2[0];
-        } else if (command.get(0).contains("زنگ بزن به ")) {
-            String[] separated = command.get(0).split("به ");
-            foundedContact = findContact(separated[1]);
-            foundedContact.addAll(checkContact(separated[1]));
+            if (command.get(0).contains("زنگ بزن به ")) {
+                String[] separated = command.get(0).split("به ");
+//            foundedContact = findContact(separated[1]);
+//            foundedContact.addAll(checkContact(separated[1]));
+                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
 //            temp = separated[1];
+            } else {
+                String[] separated1 = command.get(0).split("به ");
+                String[] separated2 = separated1[1].split(" زنگ بزن");
+                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//            foundedContact = findContact(separated2[0]);
+//            foundedContact.addAll(checkContact(separated2[0]));
+//            temp = separated2[0];
+            }
         }
 
         if (foundedContact.size() > 0) {
@@ -262,8 +272,9 @@ public class CommandAction {
         if ((command.get(0).contains("پیامک") || command.get(0).contains("پیام")) && command.get(0).contains("بنویس")) {
             separated1 = command.get(0).split("به ");
             String[] separated2 = separated1[1].split(" بنویس ");
-            foundedContact = findContact(separated2[0]);
-            foundedContact.addAll(checkContact(separated2[0]));
+            foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+//            foundedContact = findContact(separated2[0]);
+//            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
 //            s = getPhoneNumber(findContact(separated2[0]));
 //            if (s == null)
@@ -273,13 +284,15 @@ public class CommandAction {
 
         } else if (command.get(0).contains("پیامک") || command.get(0).contains("پیام")) {
             separated1 = command.get(0).split("به ");
-            if (separated1[1].length() > 20) {
-                foundedContact = findContact(separated1[1].substring(0, 20));
-                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
+            if (separated1[1].length() > 12) {
+                foundedContact = myCheckFunction(separated1[1].substring(0,12), getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated1[1].substring(0, 20));
+//                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
             } else {
                 Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
-                foundedContact = findContact(separated1[1].substring(0, 10));
-                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
+                foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false, true);
+//                foundedContact = findContact(separated1[1].substring(0, 10));
+//                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
             }
         }
         //test
@@ -327,7 +340,6 @@ public class CommandAction {
                 Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
             }
 
-
         }
         if (command.get(0).contains("یادم بیار که")) {
             String[] separated = command.get(0).split(" یادم بیار که ");
@@ -347,7 +359,7 @@ public class CommandAction {
 
             } else {
                 addReminder(-1, -1, -1, dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
             }
         }
         if (command.get(0).contains("امروز") && command.get(0).contains("یادآوری")) {
@@ -385,28 +397,99 @@ public class CommandAction {
         }
     }
 
-    //no Test
+    public ArrayList<String> getAllAppName() {
+        List<PackageInfo> apps = context.getPackageManager().getInstalledPackages(0);
+
+        ArrayList<String> res = new ArrayList<>();
+        for (int i = 0; i < apps.size(); i++) {
+            PackageInfo p = apps.get(i);
+            if (!p.applicationInfo.loadLabel(context.getPackageManager()).toString().contains("com."))
+                res.add(p.applicationInfo.loadLabel(context.getPackageManager()).toString());
+        }
+        return res;
+    }
+
+    private ArrayList<String> myCheckFunction(String name, ArrayList<String> list, boolean pOe, boolean both) {
+        ArrayList<String> listResult = new ArrayList<>();
+        ArrayList<String> finalResult = new ArrayList<>();
+        if (pOe || both) {
+            //algorithm for persian target
+            String string = name.trim();
+            for (int i = 0; i < list.size(); i++) {
+                if (textPersian(list.get(i).charAt(0))) {
+                    if (string.contains(list.get(i).trim())) {
+                        finalResult.add(list.get(i));
+                    }
+                }
+            }
+        }
+        if (!pOe || both) {
+            //algorithm for english/finglish target
+            StringBuilder temp = new StringBuilder();
+            for (int i = 0; i < name.length(); i++) {
+                temp.append(convertFarsiToEnglish(name.charAt(i)));
+                Log.d(TAG, "onCreate: " + temp);
+            }
+            String[] result = new String[3];
+            int[] max = new int[3];
+            for (int i = 0; i < list.size(); i++) {
+                int count = 0;
+                if (!textPersian(list.get(i).charAt(0))) {
+                    int k = 0;
+                    for (int j = 0; j < temp.length() && k < list.get(i).length(); j++) {
+                        for (; k < list.get(i).length(); k++) {
+                            if (temp.charAt(j) == list.get(i).toLowerCase().charAt(k)) {
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                    if (max[0] < count) {
+                        max[0] = count;
+                        result[0] = (list.get(i));
+                    } else if ((max[0] >= count) && (max[1] < count)) {
+                        max[1] = count;
+                        result[1] = (list.get(i));
+                    } else if ((max[0] >= count) && (max[1] >= count) && (max[2] < count)) {
+                        max[2] = count;
+                        result[2] = (list.get(i));
+                    }
+                }
+            }
+            listResult.addAll(Arrays.asList(result).subList(0, 3));
+        }
+
+        Log.d(TAG, "onCreate: " + listResult);
+        if (both) {
+            finalResult.addAll(listResult);
+            return finalResult;
+        } else if (pOe) {
+            return finalResult;
+        } else
+            return listResult;
+
+    }
+
+    //not complete
     public void openAppCommand() {
-        String appName;
+        String appName = "";
+        String temp;
         if (command.get(0).contains("باز کن") || command.get(0).contains("اجرا کن")) {
             String[] separated = command.get(0).split(" ", 2);
 
             if (separated[0].equals("اجرا") || separated[0].equals("باز")) {
                 String[] separated2 = separated[1].split("کن ");
-                appName = separated2[1];
+                String[] separated3 = separated2[1].split(" ", 2);
+                temp = separated3[0];
             } else {
-                String[] temp = (command.get(0).contains("اجرا")) ?
-                        command.get(0).split(" اجرا") : command.get(0).split(" باز");
-                appName = temp[0];
-//                if (command.get(0).contains("اجرا")) {
-//                    String[] separated3 = command.get(0).split(" اجرا");
-//                    appName = separated3[0];
-//                } else {
-//                    String[] separated3 = command.get(0).split(" باز");
-//                    appName = separated3[0];
-//                }
+                temp = separated[0];
             }
-
+            ArrayList<String> temp2 = myCheckFunction(temp, getAllAppName(), true, false);
+            if (temp2.size() == 1) {
+                appName = temp2.get(0);
+            } else {
+                temp2 = myCheckFunction(temp, getAllAppName(), false, true);
+            }
             Intent launchIntent = context.getPackageManager()
                     .getLaunchIntentForPackage(Objects.requireNonNull(getPackageName(appName)).packageName);
             if (launchIntent != null) {
@@ -422,7 +505,7 @@ public class CommandAction {
             if (separated[1].contains(":")) {
                 String[] separated2 = separated[1].split(":");
                 String[] separated3 = separated2[1].split(" ", 2);
-                setAlarm(Integer.parseInt(separated2[0]),Integer.parseInt(separated3[0]));
+                setAlarm(Integer.parseInt(separated2[0]), Integer.parseInt(separated3[0]));
             } else if (separated[1].contains("دیگه") || separated[1].contains("دیگر")) {
                 String[] separated2 = command.get(0).split(" ", 5);
 
@@ -432,11 +515,11 @@ public class CommandAction {
                 Log.d(TAG, "setAlarmCommand: " + cal.get(Calendar.MINUTE));
                 int hour = cal.get(Calendar.HOUR_OF_DAY) + changeDigitToInt(separated2[0]);
                 int minute = cal.get(Calendar.MINUTE) + changeDigitToInt(separated2[3]);
-                if (minute > 60){
+                if (minute > 60) {
                     minute -= 60;
                     hour++;
                 }
-                if (hour > 24){
+                if (hour > 24) {
                     hour -= 24;
                 }
                 setAlarm(hour, minute);
@@ -447,7 +530,7 @@ public class CommandAction {
         }
     }
 
-    private void setAlarm(int hour, int minute){
+    private void setAlarm(int hour, int minute) {
         Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
         i.putExtra(AlarmClock.EXTRA_HOUR, hour);
         i.putExtra(AlarmClock.EXTRA_MINUTES, minute);
@@ -684,9 +767,9 @@ public class CommandAction {
                 + String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
     }
 
-    private List<String> getArrayOfContacts() {
+    private ArrayList<String> getArrayOfContacts() {
 
-        List<String> contacts = new ArrayList<>();
+        ArrayList<String> contacts = new ArrayList<>();
 
         Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.HAS_PHONE_NUMBER},
                 null, null, null);
@@ -1055,5 +1138,10 @@ public class CommandAction {
 
     private void requestPermissionLocation() {
         ActivityCompat.requestPermissions((Activity) context, new String[]{ACCESS_FINE_LOCATION}, 1);
+    }
+
+    public static boolean textPersian(char s) {
+        int c = (int) s;
+        return c >= 0x0600 && c <= 0x06FF || c == 0xFB8A || c == 0x067E || c == 0x0686 || c == 0x06AF;
     }
 }

@@ -22,14 +22,18 @@ import android.widget.Toast;
 
 import com.act.voicecommand.ApiService.ApiClient;
 import com.act.voicecommand.ApiService.ApiInterface;
+import com.act.voicecommand.Calendar.ChangeDate;
 import com.act.voicecommand.PrayerTime.DataOfPrayerTime;
 import com.act.voicecommand.PrayerTime.PrayerTimeResponse;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -88,7 +92,7 @@ public class MyCustomDialogPrayer extends BaseActivity {
         texts = new ArrayList<>();
         calendar = Calendar.getInstance();
         pageNumber = calendar.get(Calendar.DAY_OF_MONTH);
-        getPrayerTime(cityName, calendar.get(Calendar.DAY_OF_MONTH));
+        getPrayerTime(cityName, calendar.get(Calendar.DAY_OF_MONTH), false);
 
         closeButton = findViewById(R.id.close2);
         rightButton = findViewById(R.id.right2);
@@ -116,12 +120,22 @@ public class MyCustomDialogPrayer extends BaseActivity {
             @Override
             public void onClick(View view) {
                 texts.clear();
-                if (pageNumber < 0) {
+                if (pageNumber < 1) {
                     pageNumber++;
                 }
 
                 pageNumber--;
 
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date d = null;
+                try {
+                    d = dateFormat.parse(times.get(pageNumber).getDate().getGregorian().getDate().replace('-', '/'));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                dateFormat.applyPattern("yyyy/MM/dd");
+                texts.add(ChangeDate.changeMiladiToFarsi(dateFormat.format(d)));
+                icons.add("temp");
                 texts.add(times.get(pageNumber).getTiming().getFajr());
                 icons.add("morning");
                 texts.add(times.get(pageNumber).getTiming().getSunrise());
@@ -147,10 +161,20 @@ public class MyCustomDialogPrayer extends BaseActivity {
                 texts.clear();
                 if (pageNumber > times.size() - 2) {
                     pageNumber--;
+                    getPrayerTime(cityName, pageNumber, true);
                 }
 
                 pageNumber++;
-
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date d = null;
+                try {
+                    d = dateFormat.parse(times.get(pageNumber).getDate().getGregorian().getDate().replace('-', '/'));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                dateFormat.applyPattern("yyyy/MM/dd");
+                texts.add(ChangeDate.changeMiladiToFarsi(dateFormat.format(d)));
+                icons.add("temp");
                 texts.add(times.get(pageNumber).getTiming().getFajr());
                 icons.add("morning");
                 texts.add(times.get(pageNumber).getTiming().getSunrise());
@@ -171,7 +195,7 @@ public class MyCustomDialogPrayer extends BaseActivity {
         });
     }
 
-    private void getPrayerTime(String cityName, final int num) {
+    private void getPrayerTime(String cityName, final int num, final boolean state) {
         final double[] longitude = {0};
         final double[] latitude = {0};
 
@@ -187,7 +211,7 @@ public class MyCustomDialogPrayer extends BaseActivity {
         if (cursor.moveToFirst()) {
             latitude[0] = cursor.getDouble(3);
             longitude[0] = cursor.getDouble(4);
-            showPrayTime(finalCityName, num, latitude[0], longitude[0]);
+            showPrayTime(finalCityName, num, latitude[0], longitude[0], state);
             cursor.close();
         } else {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -206,7 +230,7 @@ public class MyCustomDialogPrayer extends BaseActivity {
                                     if (location != null){
                                         latitude[0] = location.getLatitude();
                                         longitude[0] = location.getLongitude();
-                                        showPrayTime(" ", num, latitude[0], longitude[0]);
+                                        showPrayTime(" ", num, latitude[0], longitude[0], state);
                                     }
                                 }
                             });
@@ -229,14 +253,17 @@ public class MyCustomDialogPrayer extends BaseActivity {
 
     }
 
-    private void showPrayTime(final String name, final int num, double lat, double lon){
+    private void showPrayTime(final String name, final int num, double lat, double lon, boolean state){
 
         ApiInterface apiService = ApiClient.getPrayerTimeClient().create(ApiInterface.class);
 
         final Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH) + 1;
+        if (state)
+            month++;
 
         Call<PrayerTimeResponse> call = apiService.getPrayerTime(lat, lon,
-                calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR), 1, 7);
+                month, calendar.get(Calendar.YEAR), 1, 7);
         call.enqueue(new Callback<PrayerTimeResponse>() {
             private static final String TAG = "myCustomPrayer";
 
@@ -245,7 +272,18 @@ public class MyCustomDialogPrayer extends BaseActivity {
                 assert response.body() != null;
                 String title = "اوقات شرعی " + name;
                 titleTv.setText(title);
-
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date d = null;
+                try {
+                    d = dateFormat.parse(response.body().getData().get(num).getDate().getGregorian().getDate().replace('-', '/'));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                dateFormat.applyPattern("yyyy/MM/dd");
+//                Log.d(TAG, "onResponse: " + ChangeDate.changeMiladiToFarsi("2019/12/5"));
+//                Log.d(TAG, "onResponse: " + dateFormat.format("5/12/2018"));
+                prayTime.add(ChangeDate.changeMiladiToFarsi(dateFormat.format(d)));
+                icons.add("temp");
                 prayTime.add(response.body().getData().get(num).getTiming().getFajr());
                 icons.add("morning");
                 prayTime.add(response.body().getData().get(num).getTiming().getSunrise());

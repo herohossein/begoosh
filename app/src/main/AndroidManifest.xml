@@ -38,20 +38,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Speech2Text" />
+        <activity android:name=".Speech2TextActivity" />
         <activity android:name=".TutorialActivity" />
-        <activity android:name=".MyCustomDialogPrayer"
-            android:theme="@style/myTheme"
-            />
+        <activity
+            android:name=".MyCustomDialogPrayer"
+            android:theme="@style/myTheme" />
         <activity android:name=".BaseActivity" />
         <activity android:name=".AboutActivity" />
-        <activity android:name=".SupportActivity"/>
+        <activity android:name=".SupportActivity" />
         <activity
             android:name=".MyCustomDialog"
-            android:theme="@style/myTheme"
-            />
-        <activity android:name=".Splash"
-           >
+            android:theme="@style/myTheme" />
+        <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,7 +62,7 @@
             android:excludeFromRecents="true"
             android:finishOnTaskLaunch="false"
             android:theme="@style/myTheme" />
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity" />
 
         <receiver android:name=".VoiceWidget">
             <intent-filter>

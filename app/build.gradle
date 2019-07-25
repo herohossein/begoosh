@@ -37,4 +37,5 @@ dependencies {
     implementation files('libs/sqliteassethelper-2.0.1.jar')
     implementation 'com.narayanacharya:WaveView:0.9.3'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
+    implementation 'com.rm:rmswitch:1.2.2'
 }
