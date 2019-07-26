@@ -51,10 +51,13 @@ public void onCreate(Bundle savedInstanceState) {
 	init();
 	
 	recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+	
+	
+	
 	if (needPermissions(this)) {
 		requestPermissions();
 	} else {
-		
+
 		//            List<String> list = new ArrayList<>();
 		//            list.add("تماس با مامان جون");
 		//            commandAction = new CommandAction(this, list);
@@ -160,9 +163,30 @@ public void onClick(View v) {
 	
 }
 
+//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//    return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+//                   != PackageManager.PERMISSION_GRANTED;}
+
+//String[] permissions = new String[]{
+//        /*Manifest.permission.CALL_PHONE,
+//		Manifest.permission.READ_CONTACTS,
+//		Manifest.permission.CAMERA,
+//		Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//		Manifest.permission.SEND_SMS,
+//		Manifest.permission.WRITE_CALENDAR,
+//		Manifest.permission.READ_CALENDAR,*/
+//        Manifest.permission.RECORD_AUDIO};
+//requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
+
+
 static public boolean needPermissions(Activity activity) {
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		return activity.checkSelfPermission(Manifest.permission.CALL_PHONE)
+		return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+				       != PackageManager.PERMISSION_GRANTED
+				       || activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+						          != PackageManager.PERMISSION_GRANTED;
+
+		        /*Manifest.permission.CALL_PHONE)
 				       != PackageManager.PERMISSION_GRANTED
 				       || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
 						          != PackageManager.PERMISSION_GRANTED
@@ -176,8 +200,7 @@ static public boolean needPermissions(Activity activity) {
 						          != PackageManager.PERMISSION_GRANTED
 				       || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
 						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-						          != PackageManager.PERMISSION_GRANTED;
+				       || activity.checkSelfPermission*/
 	}
 	return false;
 }
@@ -185,13 +208,13 @@ static public boolean needPermissions(Activity activity) {
 @RequiresApi(api = Build.VERSION_CODES.M)
 private void requestPermissions() {
 	String[] permissions = new String[]{
-			Manifest.permission.CALL_PHONE,
+			/*Manifest.permission.CALL_PHONE,
 			Manifest.permission.READ_CONTACTS,
 			Manifest.permission.CAMERA,
-			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.SEND_SMS,
 			Manifest.permission.WRITE_CALENDAR,
-			Manifest.permission.READ_CALENDAR,
+			Manifest.permission.READ_CALENDAR,*/
+			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.RECORD_AUDIO};
 	requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
 }
