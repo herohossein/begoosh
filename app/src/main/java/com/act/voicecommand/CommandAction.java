@@ -50,7 +50,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.READ_CALENDAR;
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.SEND_SMS;
+import static android.Manifest.permission.WRITE_CALENDAR;
+import static com.act.voicecommand.MainActivity.needPermissions;
 
 public class CommandAction {
 
@@ -63,9 +69,10 @@ public static final String CONDITION = "com.act.condition";
 public static final String TEXT_MESSAGE = "com.act.textMessage";
 public static final String CITY_NAME = "com.act.cityName";
 
-public String permissionName = "";
 private List<String> command;
 private Context context;
+
+Boolean cameraPermission = false;
 
 public CommandAction(Context context, List<String> command) {
 	
@@ -104,17 +111,12 @@ public void flashLightCommand() {
 @RequiresApi(api = Build.VERSION_CODES.M)
 public void cameraCommand() {
 	if (command.get(0).contains("دوربین") || (command.get(0).contains("عکس") && command.get(0).contains("بگیر"))) {
-	
-//		if (needPermissions((Activity) context)) {
-//			permissionName = "camera";
-////			requestPermissions();
-//		} else {
-			permissionName = "";
+		if (needPermissionCamera((Activity) context)) {
+			requestPermissionCamera();
+		} else {
 			Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
 			context.startActivity(intent);
-//		}
-	
-	
+		}
 	}
 }
 
@@ -186,10 +188,7 @@ public ArrayList<String> checkContact(String contact) {
 		}
 		counter = 0;
 	}
-
-
-//        Toast.makeText(context, finalResult, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(context, String.valueOf(max), Toast.LENGTH_SHORT).show();
+	
 	Log.d(TAG, "checkContact: " + finalResult);
 	return finalResult;
 }
@@ -201,9 +200,14 @@ public void callCommand() {
 	ArrayList<String> icon = new ArrayList<>();
 	
 	if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
-		if (command.get(0).contains("تماس با")) {
-			String[] separated = command.get(0).split("با ");
-			foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+		if (needPermissionCall((Activity) context)) {
+			requestPermissionCall();
+			Toast.makeText(context,"ASDFG",Toast.LENGTH_LONG).show();
+		} else {
+			Toast.makeText(context,"ASDFG",Toast.LENGTH_LONG).show();
+			if (command.get(0).contains("تماس با")) {
+				String[] separated = command.get(0).split("با ");
+				foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
 //                foundedContact = findContact(separated[1]);
 //                foundedContact.addAll(checkContact(separated[1]));
 //            for (int i = 0; i < foundedContact.size(); i++) {
@@ -216,33 +220,38 @@ public void callCommand() {
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated[1]));
 //            call(s);
-		} else {
-			String[] separated1 = command.get(0).split("با ");
-			String[] separated2 = separated1[1].split(" تماس");
-			foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+			} else {
+				String[] separated1 = command.get(0).split("با ");
+				String[] separated2 = separated1[1].split(" تماس");
+				foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
 //                foundedContact = findContact(separated2[0]);
 //                foundedContact.addAll(checkContact(separated2[0]));
-		
-		}
+			
+			}
 //            temp = separated2[0];
 //            s = getPhoneNumber(separated2[0]);
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated2[0]));
 //            call(s);
+		}
 	} else if (command.get(0).contains("به") && command.get(0).contains("زنگ بزن")) {
-		if (command.get(0).contains("زنگ بزن به ")) {
-			String[] separated = command.get(0).split("به ");
+		if (needPermissionCall((Activity) context)) {
+			requestPermissionCall();
+		} else {
+			if (command.get(0).contains("زنگ بزن به ")) {
+				String[] separated = command.get(0).split("به ");
 //            foundedContact = findContact(separated[1]);
 //            foundedContact.addAll(checkContact(separated[1]));
-			foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+				foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
 //            temp = separated[1];
-		} else {
-			String[] separated1 = command.get(0).split("به ");
-			String[] separated2 = separated1[1].split(" زنگ بزن");
-			foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+			} else {
+				String[] separated1 = command.get(0).split("به ");
+				String[] separated2 = separated1[1].split(" زنگ بزن");
+				foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
 //            foundedContact = findContact(separated2[0]);
 //            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
+			}
 		}
 	}
 	
@@ -280,9 +289,12 @@ public boolean messageCommand() {
 	ArrayList<String> foundedContact = new ArrayList<>();
 	String[] separated1 = null;
 	if ((command.get(0).contains("پیامک") || command.get(0).contains("پیام")) && command.get(0).contains("بنویس")) {
-		separated1 = command.get(0).split("به ");
-		String[] separated2 = separated1[1].split(" بنویس ");
-		foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+		if (needPermissionSMS((Activity) context)) {
+			requestPermissionSMS();
+		} else {
+			separated1 = command.get(0).split("به ");
+			String[] separated2 = separated1[1].split(" بنویس ");
+			foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
 //            foundedContact = findContact(separated2[0]);
 //            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
@@ -291,18 +303,23 @@ public boolean messageCommand() {
 //                s = checkContact(getPhoneNumber(separated2[0]));
 //            else
 //                Toast.makeText(context, "فرد مورد نظر یافت نشد", Toast.LENGTH_SHORT).show();
-	
+		
+		}
 	} else if (command.get(0).contains("پیامک") || command.get(0).contains("پیام")) {
-		separated1 = command.get(0).split("به ");
-		if (separated1[1].length() > 12) {
-			foundedContact = myCheckFunction(separated1[1].substring(0, 12), getArrayOfContacts(), false, true);
+		if (needPermissionSMS((Activity) context)) {
+			requestPermissionSMS();
+		} else {
+			separated1 = command.get(0).split("به ");
+			if (separated1[1].length() > 12) {
+				foundedContact = myCheckFunction(separated1[1].substring(0, 12), getArrayOfContacts(), false, true);
 //                foundedContact = findContact(separated1[1].substring(0, 20));
 //                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
-		} else {
-			Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
-			foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false, true);
+			} else {
+				Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
+				foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false, true);
 //                foundedContact = findContact(separated1[1].substring(0, 10));
 //                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
+			}
 		}
 	}
 	//test
@@ -330,50 +347,62 @@ public void reminderCommand() {
 	int dayOfWeek;
 	String text;
 	if (command.get(0).contains("یادم بیار")) {
-		String[] separated = command.get(0).split(" یادم بیار ");
-		dayOfWeek = recognizeDay(separated[0]);
-		text = separated[1];
-		if (dayOfWeek == -1) {
-			String[] separated2 = separated[0].split(" ", 2);
-			String day = String.valueOf(Integer.parseInt(separated2[0]));
-			String month = monthToNumber(separated2[1]);
-			String year = String.valueOf(ChangeDate.getCurrentYear());
-			String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
-			String separatedYear = date.substring(0, 4);
-			String separatedMonth = date.substring(5, 7);
-			String separatedDay = date.substring(8, 10);
-			addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
-			Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
-			
+		if (needPermissionCalendar((Activity) context)) {
+			requestPermissionCalendar();
 		} else {
-			addReminder(-1, -1, -1, dayOfWeek, text);
-			Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
+			String[] separated = command.get(0).split(" یادم بیار ");
+			dayOfWeek = recognizeDay(separated[0]);
+			text = separated[1];
+			if (dayOfWeek == -1) {
+				String[] separated2 = separated[0].split(" ", 2);
+				String day = String.valueOf(Integer.parseInt(separated2[0]));
+				String month = monthToNumber(separated2[1]);
+				String year = String.valueOf(ChangeDate.getCurrentYear());
+				String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
+				String separatedYear = date.substring(0, 4);
+				String separatedMonth = date.substring(5, 7);
+				String separatedDay = date.substring(8, 10);
+				addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
+				Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
+				
+			} else {
+				addReminder(-1, -1, -1, dayOfWeek, text);
+				Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
+			}
+			
 		}
-		
 	}
 	if (command.get(0).contains("یادم بیار که")) {
-		String[] separated = command.get(0).split(" یادم بیار که ");
-		dayOfWeek = recognizeDay(separated[0]);
-		text = separated[1];
-		if (dayOfWeek == -1) {
-			String[] separated2 = separated[0].split(" ", 2);
-			String day = String.valueOf(Integer.parseInt(separated2[0]));
-			String month = monthToNumber(separated2[1]);
-			String year = String.valueOf(ChangeDate.getCurrentYear());
-			String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
-			String separatedYear = date.substring(0, 4);
-			String separatedMonth = date.substring(5, 7);
-			String separatedDay = date.substring(8, 10);
-			addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
-			Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
-			
+		if (needPermissionCalendar((Activity) context)) {
+			requestPermissionCalendar();
 		} else {
-			addReminder(-1, -1, -1, dayOfWeek, text);
-			Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
+			String[] separated = command.get(0).split(" یادم بیار که ");
+			dayOfWeek = recognizeDay(separated[0]);
+			text = separated[1];
+			if (dayOfWeek == -1) {
+				String[] separated2 = separated[0].split(" ", 2);
+				String day = String.valueOf(Integer.parseInt(separated2[0]));
+				String month = monthToNumber(separated2[1]);
+				String year = String.valueOf(ChangeDate.getCurrentYear());
+				String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
+				String separatedYear = date.substring(0, 4);
+				String separatedMonth = date.substring(5, 7);
+				String separatedDay = date.substring(8, 10);
+				addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
+				Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
+				
+			} else {
+				addReminder(-1, -1, -1, dayOfWeek, text);
+				Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 	if (command.get(0).contains("امروز") && command.get(0).contains("یادآوری")) {
-		getReminder();
+		if (needPermissionCalendar((Activity) context)) {
+			requestPermissionCalendar();
+		} else {
+			getReminder();
+		}
 	}
 }
 
@@ -1146,44 +1175,66 @@ private void getTranslation(String word) {
 	cursor.close();
 }
 
-private void requestPermissionLocation() {
-	ActivityCompat.requestPermissions((Activity) context, new String[]{ACCESS_FINE_LOCATION}, 1);
-}
-
 public static boolean textPersian(char s) {
 	int c = (int) s;
 	return c >= 0x0600 && c <= 0x06FF || c == 0xFB8A || c == 0x067E || c == 0x0686 || c == 0x06AF;
 }
 
-//static private boolean needPermissions(Activity activity) {
-//	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//		return /*activity.checkSelfPermission(Manifest.permission.CALL_PHONE)
-//				       != PackageManager.PERMISSION_GRANTED
-//				       || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-//						          != PackageManager.PERMISSION_GRANTED
-//				       ||*/ activity.checkSelfPermission(Manifest.permission.CAMERA)
-//				                                   != PackageManager.PERMISSION_GRANTED
-//				       /*|| activity.checkSelfPermission(Manifest.permission.SEND_SMS)
-//						          != PackageManager.PERMISSION_GRANTED
-//				       || activity.checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
-//						          != PackageManager.PERMISSION_GRANTED
-//				       || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
-//						          != PackageManager.PERMISSION_GRANTED*/;
-//	}
-//	return false;
-//}
-//
-//@RequiresApi(api = Build.VERSION_CODES.M)
-//private void requestPermissions() {
-//	String[] permissions = new String[]{
-//			/*Manifest.permission.CALL_PHONE,
-//			Manifest.permission.READ_CONTACTS,*/
-//			Manifest.permission.CAMERA,
-//			/*Manifest.permission.SEND_SMS,
-//			Manifest.permission.WRITE_CALENDAR,
-//			Manifest.permission.READ_CALENDAR*/};
-////	requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
-//}
-//
-//
+static private boolean needPermissionCamera(Activity activity) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		return activity.checkSelfPermission(Manifest.permission.CAMERA)
+				       != PackageManager.PERMISSION_GRANTED;
+	}
+	return false;
+}
+
+static private boolean needPermissionCall(Activity activity) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		return activity.checkSelfPermission(Manifest.permission.CALL_PHONE)
+				       != PackageManager.PERMISSION_GRANTED
+				       || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+						          != PackageManager.PERMISSION_GRANTED;
+	}
+	return false;
+}
+
+static private boolean needPermissionSMS(Activity activity) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		return activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+				       != PackageManager.PERMISSION_GRANTED
+				       || activity.checkSelfPermission(Manifest.permission.SEND_SMS)
+						          != PackageManager.PERMISSION_GRANTED;
+	}
+	return false;
+}
+
+static private boolean needPermissionCalendar(Activity activity) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		return activity.checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
+				       != PackageManager.PERMISSION_GRANTED
+				       || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
+						          != PackageManager.PERMISSION_GRANTED;
+	}
+	return false;
+}
+
+private void requestPermissionLocation() {
+	ActivityCompat.requestPermissions((Activity) context, new String[]{ACCESS_FINE_LOCATION}, 1);
+}
+
+private void requestPermissionCamera() {
+	ActivityCompat.requestPermissions((Activity) context, new String[]{CAMERA}, 1);
+}
+
+private void requestPermissionCall() {
+	ActivityCompat.requestPermissions((Activity) context, new String[]{READ_CONTACTS, CALL_PHONE}, 1);
+}
+
+private void requestPermissionSMS() {
+	ActivityCompat.requestPermissions((Activity) context, new String[]{READ_CONTACTS, SEND_SMS}, 1);
+}
+
+private void requestPermissionCalendar() {
+	ActivityCompat.requestPermissions((Activity) context, new String[]{WRITE_CALENDAR, READ_CALENDAR}, 1);
+}
 }
