@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="#fff"
     android:orientation="vertical"
-    tools:context=".Speech2TextActivity">
+    android:layoutDirection="rtl"
+    tools:context=".Activities.Speech2TextActivity">
 
 
     <LinearLayout
@@ -132,7 +133,6 @@
 
         </LinearLayout>
 
-
         <RelativeLayout
             android:id="@+id/text"
             android:layout_width="match_parent"
@@ -155,7 +155,8 @@
                 android:singleLine="false"
                 android:textColor="#FF5E3493"
                 android:textSize="16sp" />
-            <EditText
+
+            <TextView
                 android:visibility="invisible"
                 android:id="@+id/partial_result"
                 android:layout_width="wrap_content"
@@ -164,7 +165,7 @@
                 android:layout_margin="15dp"
                 android:background="@null"
                 android:ems="10"
-                android:gravity="start|top"
+                android:gravity="center"
                 android:inputType="textMultiLine|textPersonName"
                 android:padding="7dp"
                 android:singleLine="false"

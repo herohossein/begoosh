@@ -1,4 +1,4 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Dialog;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,13 +10,18 @@ import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.act.voicecommand.CommandAction;
+import com.act.voicecommand.R;
+
 import java.util.List;
+import java.util.Objects;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -48,9 +53,9 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa");
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-//        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 100);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 100);
+//        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, Integer.valueOf(2));
+//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, Integer.valueOf(100));
+//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, Integer.valueOf(100));
 
         recognizer.setRecognitionListener(this);
         recognizer.startListening(intent);
@@ -94,7 +99,6 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
 
     @Override
     public void onBufferReceived(byte[] buffer) {
-        Log.d(TAG, "onBufferReceived: ");
     }
 
     @Override
@@ -125,6 +129,7 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onResults(final Bundle results) {
         Log.d(TAG, "onResults: " + results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION));
@@ -150,6 +155,7 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
             commandAction.translateCommand();
             commandAction.weatherCommand();
             commandAction.prayerTimeCommand();
+            commandAction.gap();
         }
 
        this.finish();
@@ -159,13 +165,13 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
 
     @Override
     public void onPartialResults(final Bundle partialResults) {
-
+        Log.d(TAG, "onPartialResults: " + Objects.requireNonNull(partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)).get(0));
         mHandler = new Handler();
 
         final Runnable r = new Runnable() {
             @Override
             public void run() {
-                tv.setText(partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).get(0));
+                tv.setText(Objects.requireNonNull(partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)).get(0));
             }
         };
         mHandler.post(r);

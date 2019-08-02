@@ -1,17 +1,13 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.content.pm.ResolveInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,9 +17,12 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.MyDatabase;
+import com.act.voicecommand.R;
+import com.act.voicecommand.Dialog.VoiceDialog;
+
 import java.util.List;
 
 
@@ -37,11 +36,10 @@ public ImageView tutorialIv;
 public ImageView aboutIv;
 public ImageView supportIv;
 public ImageView typeIv;
+public ImageView promoteIv;
 SharedPreferences prefs = null;
 SpeechRecognizer recognizer;
-CommandAction commandAction;
 
-@SuppressLint("WrongConstant")
 @RequiresApi(api = Build.VERSION_CODES.M)
 @Override
 public void onCreate(Bundle savedInstanceState) {
@@ -51,10 +49,13 @@ public void onCreate(Bundle savedInstanceState) {
 	init();
 	
 	recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+	
+	
+	
 	if (needPermissions(this)) {
 		requestPermissions();
 	} else {
-		
+
 		//            List<String> list = new ArrayList<>();
 		//            list.add("تماس با مامان جون");
 		//            commandAction = new CommandAction(this, list);
@@ -102,6 +103,15 @@ public void onCreate(Bundle savedInstanceState) {
 			startActivity(i);
 		}
 	});
+	promoteIv.setOnClickListener(new View.OnClickListener() {
+		@Override
+		public void onClick(View view) {
+		
+//			Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
+//			startActivity(i);
+//			TastyToast.makeText(getApplicationContext(), "Hello World !", TastyToast.LENGTH_LONG, TastyToast.INFO);
+		}
+	});
 	
 }
 
@@ -111,6 +121,7 @@ public void init() {
 	aboutIv = findViewById(R.id.about_iv);
 	supportIv = findViewById(R.id.support_iv);
 	typeIv = findViewById(R.id.type_iv);
+	promoteIv = findViewById(R.id.promote_iv);
 	prefs = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
 }
 
@@ -160,9 +171,30 @@ public void onClick(View v) {
 	
 }
 
+//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//    return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+//                   != PackageManager.PERMISSION_GRANTED;}
+
+//String[] permissions = new String[]{
+//        /*Manifest.permission.CALL_PHONE,
+//		Manifest.permission.READ_CONTACTS,
+//		Manifest.permission.CAMERA,
+//		Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//		Manifest.permission.SEND_SMS,
+//		Manifest.permission.WRITE_CALENDAR,
+//		Manifest.permission.READ_CALENDAR,*/
+//        Manifest.permission.RECORD_AUDIO};
+//requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
+
+
 static public boolean needPermissions(Activity activity) {
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		return activity.checkSelfPermission(Manifest.permission.CALL_PHONE)
+		return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+				       != PackageManager.PERMISSION_GRANTED
+				       || activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+						          != PackageManager.PERMISSION_GRANTED;
+
+		        /*Manifest.permission.CALL_PHONE)
 				       != PackageManager.PERMISSION_GRANTED
 				       || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
 						          != PackageManager.PERMISSION_GRANTED
@@ -176,8 +208,7 @@ static public boolean needPermissions(Activity activity) {
 						          != PackageManager.PERMISSION_GRANTED
 				       || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
 						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-						          != PackageManager.PERMISSION_GRANTED;
+				       || activity.checkSelfPermission*/
 	}
 	return false;
 }
@@ -185,13 +216,13 @@ static public boolean needPermissions(Activity activity) {
 @RequiresApi(api = Build.VERSION_CODES.M)
 private void requestPermissions() {
 	String[] permissions = new String[]{
-			Manifest.permission.CALL_PHONE,
+			/*Manifest.permission.CALL_PHONE,
 			Manifest.permission.READ_CONTACTS,
 			Manifest.permission.CAMERA,
-			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.SEND_SMS,
 			Manifest.permission.WRITE_CALENDAR,
-			Manifest.permission.READ_CALENDAR,
+			Manifest.permission.READ_CALENDAR,*/
+			Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			Manifest.permission.RECORD_AUDIO};
 	requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
 }
@@ -252,30 +283,27 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 	return super.onKeyDown(keyCode, event);
 }
 
+//change
 @Override
 protected void onResume() {
 	super.onResume();
 	
 	if (prefs.getBoolean("firstrun", true)) {
-		
 		MyDatabase myDatabase;
 		SQLiteDatabase sqLiteDatabase;
 		myDatabase = new MyDatabase(getApplicationContext());
 		sqLiteDatabase = myDatabase.getReadableDatabase();
-		Cursor cursor;
-		cursor = sqLiteDatabase.rawQuery("select * from apps", null);
-		List<PackageInfo> apps = getPackageManager().getInstalledPackages(0);
 		String temp;
-		for (int i = 0; i < apps.size(); i++) {
-			PackageInfo p = apps.get(i);
-			temp = p.applicationInfo.loadLabel(getPackageManager()).toString();
-			if (!temp.contains("'")) {
-				sqLiteDatabase.execSQL("insert into apps (name) values ('" + temp + "')");
-			}
+		String temp2;
+		Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+		mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		List<ResolveInfo> pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
+		for (int i = 0; i < pkgAppsList.size(); i++) {
+			temp = pkgAppsList.get(i).loadLabel(getPackageManager()).toString();
+			temp2 = pkgAppsList.get(i).activityInfo.packageName;
+			
+			sqLiteDatabase.execSQL("insert into apps (name, package) values ('" + temp + "', '" + temp2 + "')");
 		}
-		cursor.moveToFirst();
-//		Toast.makeText(getApplicationContext(), cursor.getString(0), Toast.LENGTH_LONG).show();
-		
 		prefs.edit().putBoolean("firstrun", false).apply();
 	}
 }

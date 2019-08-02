@@ -1,13 +1,14 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.R;
 
 public class TutorialActivity extends BaseActivity {
 

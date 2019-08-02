@@ -8,7 +8,7 @@
     android:gravity="center">
 
     <ImageButton
-        android:id="@+id/button"
+        android:id="@+id/widgetButton"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:background="@drawable/voice"

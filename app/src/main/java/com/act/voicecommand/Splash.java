@@ -6,6 +6,8 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
+import com.act.voicecommand.Activities.MainActivity;
+
 public class Splash extends AppCompatActivity {
     public Boolean isBack = false;
     ImageView begoosh;

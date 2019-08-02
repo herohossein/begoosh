@@ -8,12 +8,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Icon;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.location.Location;
@@ -22,35 +20,43 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.AlarmClock;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.act.voicecommand.ApiService.ApiClient;
 import com.act.voicecommand.ApiService.ApiInterface;
 import com.act.voicecommand.Calendar.ChangeDate;
+import com.act.voicecommand.Dialog.MyCustomDialog;
+import com.act.voicecommand.Dialog.MyCustomDialogPrayer;
 import com.act.voicecommand.Weather.WeatherResponse;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.READ_CALENDAR;
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.SEND_SMS;
+import static android.Manifest.permission.WRITE_CALENDAR;
+
 
 public class CommandAction {
 
@@ -62,6 +68,7 @@ public class CommandAction {
     public static final String CONDITION = "com.act.condition";
     public static final String TEXT_MESSAGE = "com.act.textMessage";
     public static final String CITY_NAME = "com.act.cityName";
+    public static final String CITY_STATE = "com.act.cityName";
 
 
     private List<String> command;
@@ -71,6 +78,101 @@ public class CommandAction {
 
         this.command = command;
         this.context = context;
+    }
+
+    public void gap() {
+        int random = new Random().nextInt(4) + 1;
+        if (command.get(0).equals("سلام") || command.get(0).equals("درود")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "سلام! روزت بخیر", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "درود بر تو", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "سلام! احوال شما؟", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 4:
+                    TastyToast.makeText(context, "سلام سلام!! چه خبرا؟", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+            }
+        } else if ((command.get(0).contains("سلام") && command.get(0).contains("چطوری")) || command.get(0).equals("چطوری")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "من عالی ام، تو چطوری؟", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "قربونت، خیلی خوبم", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "من که خوب خوبم، تو چطوری؟", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 4:
+                    TastyToast.makeText(context, "خیلی خوبم", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+            }
+        } else if (command.get(0).contains("خوبم")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "منم همینطور! بزن قدش!", TastyToast.LENGTH_LONG, TastyToast.WARNING);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "چقدر عالی!", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "خدا رو شکر", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                case 4:
+                    TastyToast.makeText(context, "چقدر خوبه که خوبی", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+            }
+        } else if ((command.get(0).contains("خوب") && command.get(0).contains("نیستم")) || command.get(0).contains("بدم") || command.get(0).equals("بد") || command.get(0).contains("ناراحت")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "ای بابا! آخه چرا؟ یکم بخند حالا", TastyToast.LENGTH_LONG, TastyToast.ERROR);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "چه بد", TastyToast.LENGTH_LONG, TastyToast.ERROR);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "حیف! چرا آخه؟", TastyToast.LENGTH_LONG, TastyToast.ERROR);
+                    break;
+                case 4:
+                    TastyToast.makeText(context, "بیخیال بابا! بخند فقط", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+            }
+
+        } else if (command.get(0).contains("چه خبر")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "خبر که زیاده! تو چی میخوای؟", TastyToast.LENGTH_LONG, TastyToast.INFO);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "سلامتی", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "خدا رو شکر می گذره", TastyToast.LENGTH_LONG, TastyToast.INFO);
+                    break;
+                case 4:
+                    TastyToast.makeText(context, "همه چی عالی", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    break;
+            }
+        } else if (command.get(0).equals("خداحافظ")) {
+            switch (random) {
+                case 1:
+                    TastyToast.makeText(context, "مراقب خودت باش", TastyToast.LENGTH_LONG, TastyToast.WARNING);
+                    break;
+                case 2:
+                    TastyToast.makeText(context, "به سلامت", TastyToast.LENGTH_LONG, TastyToast.WARNING);
+                    break;
+                case 3:
+                    TastyToast.makeText(context, "خدانگهدارت", TastyToast.LENGTH_LONG, TastyToast.WARNING);
+                    break;
+                case 4:
+                    TastyToast.makeText(context, "میبینمت", TastyToast.LENGTH_LONG, TastyToast.WARNING);
+                    break;
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -101,87 +203,16 @@ public class CommandAction {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void cameraCommand() {
         if (command.get(0).contains("دوربین") || (command.get(0).contains("عکس") && command.get(0).contains("بگیر"))) {
-            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-            context.startActivity(intent);
-        }
-    }
-
-    private ArrayList<String> findContact(String string) {
-        string = string.trim();
-        ArrayList<String> nameContacts = new ArrayList<>();
-        List<String> contacts = getArrayOfContacts();
-
-        for (int i = 0; i < contacts.size(); i++) {
-            if (string.contains(contacts.get(i).trim())) {
-                nameContacts.add(contacts.get(i));
+            if (needPermissionCamera((Activity) context)) {
+                requestPermissionCamera();
+            } else {
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                context.startActivity(intent);
             }
         }
-        return nameContacts;
-    }
-
-    public ArrayList<String> checkContact(String contact) {
-        ArrayList<String> arrayContacts = getArrayOfContacts();
-        String result = "";
-
-        for (int i = 0; i < contact.length(); i++) {
-            result = result + convertFarsiToEnglish(contact.charAt(i));
-            Log.e(TAG, "checkContact: " + convertFarsiToEnglish(contact.charAt(i)));
-        }
-
-        int[] max = new int[3];
-        for (int i = 0; i < 3; i++) {
-            max[i] = 0;
-        }
-
-        int counter = 0;
-        ArrayList<String> finalResult = new ArrayList<>();
-        for (int k = 0; k < arrayContacts.size(); k++) {
-            Boolean wasVowel = true;
-            String[] check = new String[2];
-            check[0] = arrayContacts.get(k).toLowerCase();
-            check[1] = arrayContacts.get(k);
-//            String check[0] = arrayContacts.get(k).toLowerCase();
-            int j = 0;
-            for (int i = 0; i < result.length(); i++) {
-                if (!wasVowel && (result.toLowerCase().charAt(i) != 'a' && result.toLowerCase().charAt(i) != 'o'
-                        && result.toLowerCase().charAt(i) != 'u' && result.toLowerCase().charAt(i) != 'e'
-                        && result.toLowerCase().charAt(i) != 'i')) {
-                    j++;
-                }
-                if (result.toLowerCase().charAt(i) != 'a' && result.toLowerCase().charAt(i) != 'o' && result.toLowerCase().charAt(i) != 'u'
-                        && result.toLowerCase().charAt(i) != 'e' && result.toLowerCase().charAt(i) != 'i') {
-                    wasVowel = false;
-                } else {
-                    wasVowel = true;
-                }
-                if (j >= check[0].length() - 1) {
-                    break;
-                }
-                if (result.toLowerCase().charAt(i) == check[0].charAt(j)) {
-                    counter++;
-                }
-                j++;
-            }
-            if (max[0] < counter) {
-                max[0] = counter;
-                finalResult.add(check[1]);
-            } else if ((max[0] > counter) && (max[1] < counter)) {
-                max[1] = counter;
-                finalResult.add(check[1]);
-            } else if ((max[0] > counter) && (max[1] > counter) && (max[2] < counter)) {
-                max[2] = counter;
-                finalResult.add(check[1]);
-            }
-            counter = 0;
-        }
-
-
-//        Toast.makeText(context, finalResult, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(context, String.valueOf(max), Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "checkContact: " + finalResult);
-        return finalResult;
     }
 
     public void callCommand() {
@@ -191,9 +222,14 @@ public class CommandAction {
         ArrayList<String> icon = new ArrayList<>();
 
         if (command.get(0).contains("با") && command.get(0).contains("تماس")) {
-            if (command.get(0).contains("تماس با")) {
-                String[] separated = command.get(0).split("با ");
-                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+            if (needPermissionCall((Activity) context)) {
+                requestPermissionCall();
+                Toast.makeText(context, "ASDFG", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(context, "ASDFG", Toast.LENGTH_LONG).show();
+                if (command.get(0).contains("تماس با")) {
+                    String[] separated = command.get(0).split("با ");
+                    foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false);
 //                foundedContact = findContact(separated[1]);
 //                foundedContact.addAll(checkContact(separated[1]));
 //            for (int i = 0; i < foundedContact.size(); i++) {
@@ -206,33 +242,38 @@ public class CommandAction {
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated[1]));
 //            call(s);
-            } else {
-                String[] separated1 = command.get(0).split("با ");
-                String[] separated2 = separated1[1].split(" تماس");
-                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+                } else {
+                    String[] separated1 = command.get(0).split("با ");
+                    String[] separated2 = separated1[1].split(" تماس");
+                    foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false);
 //                foundedContact = findContact(separated2[0]);
 //                foundedContact.addAll(checkContact(separated2[0]));
 
-            }
+                }
 //            temp = separated2[0];
 //            s = getPhoneNumber(separated2[0]);
 //            if (s == null)
 //                s = getPhoneNumber(checkContact(separated2[0]));
 //            call(s);
+            }
         } else if (command.get(0).contains("به") && command.get(0).contains("زنگ بزن")) {
-            if (command.get(0).contains("زنگ بزن به ")) {
-                String[] separated = command.get(0).split("به ");
+            if (needPermissionCall((Activity) context)) {
+                requestPermissionCall();
+            } else {
+                if (command.get(0).contains("زنگ بزن به ")) {
+                    String[] separated = command.get(0).split("به ");
 //            foundedContact = findContact(separated[1]);
 //            foundedContact.addAll(checkContact(separated[1]));
-                foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false, true);
+                    foundedContact = myCheckFunction(separated[1], getArrayOfContacts(), false);
 //            temp = separated[1];
-            } else {
-                String[] separated1 = command.get(0).split("به ");
-                String[] separated2 = separated1[1].split(" زنگ بزن");
-                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+                } else {
+                    String[] separated1 = command.get(0).split("به ");
+                    String[] separated2 = separated1[1].split(" زنگ بزن");
+                    foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false);
 //            foundedContact = findContact(separated2[0]);
 //            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
+                }
             }
         }
 
@@ -270,9 +311,12 @@ public class CommandAction {
         ArrayList<String> foundedContact = new ArrayList<>();
         String[] separated1 = null;
         if ((command.get(0).contains("پیامک") || command.get(0).contains("پیام")) && command.get(0).contains("بنویس")) {
-            separated1 = command.get(0).split("به ");
-            String[] separated2 = separated1[1].split(" بنویس ");
-            foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false, true);
+            if (needPermissionSMS((Activity) context)) {
+                requestPermissionSMS();
+            } else {
+                separated1 = command.get(0).split("به ");
+                String[] separated2 = separated1[1].split(" بنویس ");
+                foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), false);
 //            foundedContact = findContact(separated2[0]);
 //            foundedContact.addAll(checkContact(separated2[0]));
 //            temp = separated2[0];
@@ -282,17 +326,22 @@ public class CommandAction {
 //            else
 //                Toast.makeText(context, "فرد مورد نظر یافت نشد", Toast.LENGTH_SHORT).show();
 
+            }
         } else if (command.get(0).contains("پیامک") || command.get(0).contains("پیام")) {
-            separated1 = command.get(0).split("به ");
-            if (separated1[1].length() > 12) {
-                foundedContact = myCheckFunction(separated1[1].substring(0,12), getArrayOfContacts(), false, true);
+            if (needPermissionSMS((Activity) context)) {
+                requestPermissionSMS();
+            } else {
+                separated1 = command.get(0).split("به ");
+                if (separated1[1].length() > 12) {
+                    foundedContact = myCheckFunction(separated1[1].substring(0, 12), getArrayOfContacts(), false);
 //                foundedContact = findContact(separated1[1].substring(0, 20));
 //                foundedContact.addAll(checkContact(separated1[1].substring(0, 20)));
-            } else {
-                Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
-                foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false, true);
+                } else {
+                    Log.d(TAG, "messageCommand: " + separated1[1].substring(0, 10));
+                    foundedContact = myCheckFunction(separated1[1], getArrayOfContacts(), false);
 //                foundedContact = findContact(separated1[1].substring(0, 10));
 //                foundedContact.addAll(checkContact(separated1[1].substring(0, 10)));
+                }
             }
         }
         //test
@@ -320,50 +369,62 @@ public class CommandAction {
         int dayOfWeek;
         String text;
         if (command.get(0).contains("یادم بیار")) {
-            String[] separated = command.get(0).split(" یادم بیار ");
-            dayOfWeek = recognizeDay(separated[0]);
-            text = separated[1];
-            if (dayOfWeek == -1) {
-                String[] separated2 = separated[0].split(" ", 2);
-                String day = String.valueOf(Integer.parseInt(separated2[0]));
-                String month = monthToNumber(separated2[1]);
-                String year = String.valueOf(ChangeDate.getCurrentYear());
-                String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
-                String separatedYear = date.substring(0, 4);
-                String separatedMonth = date.substring(5, 7);
-                String separatedDay = date.substring(8, 10);
-                addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
-
+            if (needPermissionCalendar((Activity) context)) {
+                requestPermissionCalendar();
             } else {
-                addReminder(-1, -1, -1, dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
-            }
+                String[] separated = command.get(0).split(" یادم بیار ");
+                dayOfWeek = recognizeDay(separated[0]);
+                text = separated[1];
+                if (dayOfWeek == -1) {
+                    String[] separated2 = separated[0].split(" ", 2);
+                    String day = String.valueOf(Integer.parseInt(separated2[0]));
+                    String month = monthToNumber(separated2[1]);
+                    String year = String.valueOf(ChangeDate.getCurrentYear());
+                    String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
+                    String separatedYear = date.substring(0, 4);
+                    String separatedMonth = date.substring(5, 7);
+                    String separatedDay = date.substring(8, 10);
+                    addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
+                    Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
 
+                } else {
+                    addReminder(-1, -1, -1, dayOfWeek, text);
+                    Toast.makeText(context, "یادت میارم حتما" + String.valueOf(dayOfWeek), Toast.LENGTH_LONG).show();
+                }
+
+            }
         }
         if (command.get(0).contains("یادم بیار که")) {
-            String[] separated = command.get(0).split(" یادم بیار که ");
-            dayOfWeek = recognizeDay(separated[0]);
-            text = separated[1];
-            if (dayOfWeek == -1) {
-                String[] separated2 = separated[0].split(" ", 2);
-                String day = String.valueOf(Integer.parseInt(separated2[0]));
-                String month = monthToNumber(separated2[1]);
-                String year = String.valueOf(ChangeDate.getCurrentYear());
-                String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
-                String separatedYear = date.substring(0, 4);
-                String separatedMonth = date.substring(5, 7);
-                String separatedDay = date.substring(8, 10);
-                addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
-
+            if (needPermissionCalendar((Activity) context)) {
+                requestPermissionCalendar();
             } else {
-                addReminder(-1, -1, -1, dayOfWeek, text);
-                Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
+                String[] separated = command.get(0).split(" یادم بیار که ");
+                dayOfWeek = recognizeDay(separated[0]);
+                text = separated[1];
+                if (dayOfWeek == -1) {
+                    String[] separated2 = separated[0].split(" ", 2);
+                    String day = String.valueOf(Integer.parseInt(separated2[0]));
+                    String month = monthToNumber(separated2[1]);
+                    String year = String.valueOf(ChangeDate.getCurrentYear());
+                    String date = ChangeDate.changeFarsiToMiladi(year + "/" + month + "/" + day);
+                    String separatedYear = date.substring(0, 4);
+                    String separatedMonth = date.substring(5, 7);
+                    String separatedDay = date.substring(8, 10);
+                    addReminder(Integer.parseInt(separatedYear), Integer.parseInt(separatedMonth) - 1, Integer.parseInt(separatedDay), dayOfWeek, text);
+                    Toast.makeText(context, "یادت میارم روز" + separatedDay + "/" + separatedMonth + "/" + separatedYear, Toast.LENGTH_LONG).show();
+
+                } else {
+                    addReminder(-1, -1, -1, dayOfWeek, text);
+                    Toast.makeText(context, "یادت میارم حتما" + dayOfWeek, Toast.LENGTH_LONG).show();
+                }
             }
         }
         if (command.get(0).contains("امروز") && command.get(0).contains("یادآوری")) {
-            getReminder();
+            if (needPermissionCalendar((Activity) context)) {
+                requestPermissionCalendar();
+            } else {
+                getReminder();
+            }
         }
     }
 
@@ -378,11 +439,11 @@ public class CommandAction {
 
     public void doSilentCommand() {
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        if (command.get(0).contains("قطع صدا") || command.get(0).contains("حالت بی صدا") ||
+        if ((command.get(0).contains("قطع") && command.get(0).contains("صدا")) || command.get(0).contains("حالت بی صدا") ||
                 command.get(0).contains("حالت لرزش") || command.get(0).contains("حالت ویبره")) {
 //            manager.setStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.RINGER_MODE_SILENT, 0);
             manager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-        } else if (command.get(0).contains("حالت صدادار") || command.get(0).contains("حالت با صدا")) {
+        } else if (command.get(0).contains("حالت صدا دار") || command.get(0).contains("حالت صدادار") || command.get(0).contains("حالت با صدا")) {
 //            manager.setStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.MODE_RINGTONE, 0);
             manager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
@@ -397,47 +458,49 @@ public class CommandAction {
         }
     }
 
-    public ArrayList<String> getAllAppName() {
-        List<PackageInfo> apps = context.getPackageManager().getInstalledPackages(0);
-
-        ArrayList<String> res = new ArrayList<>();
-        for (int i = 0; i < apps.size(); i++) {
-            PackageInfo p = apps.get(i);
-            if (!p.applicationInfo.loadLabel(context.getPackageManager()).toString().contains("com."))
-                res.add(p.applicationInfo.loadLabel(context.getPackageManager()).toString());
+    private ArrayList<String> getAllAppName() {
+        ArrayList<String> appLists = new ArrayList<>();
+        MyDatabase myDatabase = new MyDatabase(context);
+        SQLiteDatabase db = myDatabase.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select * from apps", null);
+        cursor.moveToFirst();
+        while (cursor.moveToNext()) {
+            appLists.add(cursor.getString(0));
         }
-        return res;
+        cursor.close();
+        return appLists;
     }
 
-    private ArrayList<String> myCheckFunction(String name, ArrayList<String> list, boolean pOe, boolean both) {
-        ArrayList<String> listResult = new ArrayList<>();
+    private ArrayList<String> myCheckFunction(String name, ArrayList<String> list, boolean persian) {
         ArrayList<String> finalResult = new ArrayList<>();
-        if (pOe || both) {
-            //algorithm for persian target
-            String string = name.trim();
-            for (int i = 0; i < list.size(); i++) {
-                if (textPersian(list.get(i).charAt(0))) {
-                    if (string.contains(list.get(i).trim())) {
-                        finalResult.add(list.get(i));
-                    }
+        String[] result = new String[3];
+        boolean state = false;
+//        if (persian)
+
+        //algorithm for persian target
+        String string = name.trim();
+        for (int i = 0; i < list.size(); i++) {
+            if (textPersian(list.get(i).charAt(0))) {
+                if (string.contains(list.get(i).trim())) {
+                    finalResult.add(list.get(i));
+                    state = true;
                 }
             }
         }
-        if (!pOe || both) {
-            //algorithm for english/finglish target
+        if (!persian || !state) {
+            //algorithm for finglish target
             StringBuilder temp = new StringBuilder();
             for (int i = 0; i < name.length(); i++) {
                 temp.append(convertFarsiToEnglish(name.charAt(i)));
                 Log.d(TAG, "onCreate: " + temp);
             }
-            String[] result = new String[3];
             int[] max = new int[3];
+            int k = 0;
             for (int i = 0; i < list.size(); i++) {
                 int count = 0;
                 if (!textPersian(list.get(i).charAt(0))) {
-                    int k = 0;
-                    for (int j = 0; j < temp.length() && k < list.get(i).length(); j++) {
-                        for (; k < list.get(i).length(); k++) {
+                    for (int j = 0; j < temp.length(); j++) {
+                        for (k = j; k < list.get(i).length() && k < list.get(i).length(); k++) {
                             if (temp.charAt(j) == list.get(i).toLowerCase().charAt(k)) {
                                 count++;
                                 break;
@@ -456,44 +519,63 @@ public class CommandAction {
                     }
                 }
             }
-            listResult.addAll(Arrays.asList(result).subList(0, 3));
         }
+        if (state && persian){
+            return finalResult;
+        }
+        ArrayList<String> listResult = new ArrayList<>(Arrays.asList(result).subList(0, 3));
 
-        Log.d(TAG, "onCreate: " + listResult);
-        if (both) {
-            finalResult.addAll(listResult);
-            return finalResult;
-        } else if (pOe) {
-            return finalResult;
-        } else
-            return listResult;
+        finalResult.addAll(listResult);
+        Log.d(TAG, "myCheckFunction: " + finalResult);
+        return finalResult;
 
     }
 
-    //not complete
     public void openAppCommand() {
-        String appName = "";
+        String appName;
         String temp;
-        if (command.get(0).contains("باز کن") || command.get(0).contains("اجرا کن")) {
-            String[] separated = command.get(0).split(" ", 2);
-
-            if (separated[0].equals("اجرا") || separated[0].equals("باز")) {
-                String[] separated2 = separated[1].split("کن ");
-                String[] separated3 = separated2[1].split(" ", 2);
-                temp = separated3[0];
+        String myCommand;
+        if (command.get(0).contains("باز کن") || command.get(0).contains("اجرا کن") || command.get(0).contains("بازکن") || command.get(0).contains("اجراکن")) {
+            if (command.get(0).contains("برنامه")) {
+                myCommand = command.get(0).replace("برنامه", "");
+            } else if (command.get(0).contains("اپلیکیشن")) {
+                myCommand = command.get(0).replace("اپلیکیشن", "");
+            } else if (command.get(0).contains("اپ")) {
+                myCommand = command.get(0).replace("اپ", "");
             } else {
-                temp = separated[0];
+                myCommand = command.get(0);
             }
-            ArrayList<String> temp2 = myCheckFunction(temp, getAllAppName(), true, false);
+            Log.d(TAG, "openAppCommand: " + myCommand);
+//            String[] separated =myCommand.split(" ", 2);
+            String[] string = myCommand.split(" ");
+            if (string[0].equals("اجرا") || string[0].equals("باز")) {
+                String[] separated = myCommand.split("کن ");
+                String[] separated2 = separated[1].split(" ", 3);
+                temp = (separated2[0] + separated2[1]).trim();
+            } else {
+                String[] separated3;
+                if (myCommand.contains("اجرا"))
+                    separated3 = myCommand.split(" اجرا");
+                else
+                    separated3 = myCommand.split(" باز");
+
+                temp = separated3[0];
+            }
+            Log.d(TAG, "openAppCommand: " + temp);
+            ArrayList<String> temp2 = myCheckFunction(temp, getAllAppName(), true);
             if (temp2.size() == 1) {
                 appName = temp2.get(0);
+                Intent launchIntent = context.getPackageManager()
+                        .getLaunchIntentForPackage(Objects.requireNonNull(getPackageName(appName)).packageName);
+                if (launchIntent != null) {
+                    context.startActivity(launchIntent);//null pointer check in case package name was not found
+                }
             } else {
-                temp2 = myCheckFunction(temp, getAllAppName(), false, true);
-            }
-            Intent launchIntent = context.getPackageManager()
-                    .getLaunchIntentForPackage(Objects.requireNonNull(getPackageName(appName)).packageName);
-            if (launchIntent != null) {
-                context.startActivity(launchIntent);//null pointer check in case package name was not found
+                Intent i = new Intent(context, MyCustomDialog.class);
+                i.putExtra(TITLE, "این برنامه ها رو پیدا کردم!!");
+                i.putStringArrayListExtra(TEXT, temp2);
+                i.putExtra(CONDITION, Byte.valueOf("3"));
+                context.startActivity(i);
             }
         }
 
@@ -598,14 +680,17 @@ public class CommandAction {
                 String[] separated = command.get(0).split("افق ");
                 String[] separated2 = separated[1].split(" ", 2);
                 i.putExtra(CITY_NAME, separated2[0]);
+                i.putExtra(CITY_STATE, false);
             } else if (command.get(0).contains("وقت")) {
                 String[] separated = command.get(0).split("وقت ");
                 String[] separated2 = separated[1].split(" ", 2);
                 i.putExtra(CITY_NAME, separated2[0]);
+                i.putExtra(CITY_STATE, false);
             } else {
                 String[] separated = command.get(0).split("اذان ");
                 String[] separated2 = separated[1].split(" ", 2);
                 i.putExtra(CITY_NAME, separated2[0]);
+                i.putExtra(CITY_STATE, false);
             }
             context.startActivity(i);
         } else if (command.get(0).contains("اوقات شرعی") && (command.get(0).contains("افق") || command.get(0).contains("وقت"))) {
@@ -613,19 +698,25 @@ public class CommandAction {
                 String[] separated = command.get(0).split("وقت ");
                 String[] separated2 = separated[1].split(" ", 2);
                 i.putExtra(CITY_NAME, separated2[0]);
+                i.putExtra(CITY_STATE, false);
             } else {
                 String[] separated = command.get(0).split(" ", 2);
                 String[] separated2 = separated[1].split(" ", 2);
                 i.putExtra(CITY_NAME, separated2[0]);
+                i.putExtra(CITY_STATE, false);
             }
             context.startActivity(i);
-        } else if (command.get(0).contains("اذان") || command.get(0).contains("اذون")) {
+        } else if (command.get(0).contains("اذان ") || command.get(0).contains("اذون ")) {
             String[] separated = command.get(0).split(" ", 2);
             String[] separated2 = separated[1].split(" ", 2);
+            i.putExtra(CITY_STATE, false);
             i.putExtra(CITY_NAME, separated2[0]);
             context.startActivity(i);
+        } else if (command.get(0).equals("اذان کیه") || command.get(0).equals("اذان چه موقع هست") || command.get(0).equals("اذان کی هست")
+                || command.get(0).equals("اذان") || command.get(0).equals("اذان چه موقع") || command.get(0).equals("اذان چه موقعه")){
+            i.putExtra(CITY_STATE, true);
+            context.startActivity(i);
         }
-
     }
 
     private String monthToNumber(String month) {
@@ -698,7 +789,7 @@ public class CommandAction {
 
         String[] projection = new String[]{Events.TITLE, Events.DTSTART};
 
-        final Cursor cursor = resolver.query(CalendarContract.Events.CONTENT_URI, projection, null, null, null);
+        final Cursor cursor = resolver.query(Events.CONTENT_URI, projection, null, null, null);
 
         assert cursor != null;
         while (cursor.moveToNext()) {
@@ -928,7 +1019,7 @@ public class CommandAction {
 //
         switch (c) {
             case ' ':
-                return " ";
+                return "";
 
             case 'آ':
                 return "a";
@@ -1136,12 +1227,66 @@ public class CommandAction {
         cursor.close();
     }
 
+    public static boolean textPersian(char s) {
+        int c = (int) s;
+        return c >= 0x0600 && c <= 0x06FF || c == 0xFB8A || c == 0x067E || c == 0x0686 || c == 0x06AF;
+    }
+
+    static private boolean needPermissionCamera(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return activity.checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    static private boolean needPermissionCall(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return activity.checkSelfPermission(Manifest.permission.CALL_PHONE)
+                    != PackageManager.PERMISSION_GRANTED
+                    || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                    != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    static private boolean needPermissionSMS(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                    != PackageManager.PERMISSION_GRANTED
+                    || activity.checkSelfPermission(Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    static private boolean needPermissionCalendar(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return activity.checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
+                    != PackageManager.PERMISSION_GRANTED
+                    || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
+                    != PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
     private void requestPermissionLocation() {
         ActivityCompat.requestPermissions((Activity) context, new String[]{ACCESS_FINE_LOCATION}, 1);
     }
 
-    public static boolean textPersian(char s) {
-        int c = (int) s;
-        return c >= 0x0600 && c <= 0x06FF || c == 0xFB8A || c == 0x067E || c == 0x0686 || c == 0x06AF;
+    private void requestPermissionCamera() {
+        ActivityCompat.requestPermissions((Activity) context, new String[]{CAMERA}, 1);
+    }
+
+    private void requestPermissionCall() {
+        ActivityCompat.requestPermissions((Activity) context, new String[]{READ_CONTACTS, CALL_PHONE}, 1);
+    }
+
+    private void requestPermissionSMS() {
+        ActivityCompat.requestPermissions((Activity) context, new String[]{READ_CONTACTS, SEND_SMS}, 1);
+    }
+
+    private void requestPermissionCalendar() {
+        ActivityCompat.requestPermissions((Activity) context, new String[]{WRITE_CALENDAR, READ_CALENDAR}, 1);
     }
 }

@@ -1,20 +1,23 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Activities;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.R;
 import com.rm.rmswitch.RMSwitch;
 
 import java.util.Objects;
@@ -25,13 +28,13 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
     TextView fa;
     TextView en;
     EditText text;
-    EditText partial;
-    LinearLayout copy;
+    TextView partial;
+    TextView copy;
+    TextView clear;
     ImageView button;
     Handler mHandler;
-    final StringBuilder s = new StringBuilder();
+    SharedPreferences prefs = null;
 
-    private static final String TAG = "Speech2TextActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,15 +44,18 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
 
         fa.setTextColor(Color.parseColor("#FFFCC956"));
 
+        mSwitch.setChecked(prefs.getBoolean("mswitch", true));
         mSwitch.addSwitchObserver(new RMSwitch.RMSwitchObserver() {
             @Override
             public void onCheckStateChange(RMSwitch switchView, boolean isChecked) {
                 if (isChecked) {
                     fa.setTextColor(Color.parseColor("#FFFCC956"));
                     en.setTextColor(Color.parseColor("#FF9164C9"));
+                    prefs.edit().putBoolean("mswitch", true).apply();
                 } else {
                     fa.setTextColor(Color.parseColor("#FF9164C9"));
                     en.setTextColor(Color.parseColor("#FFFCC956"));
+                    prefs.edit().putBoolean("mswitch", false).apply();
                 }
             }
         });
@@ -57,8 +63,26 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 startVoiceRecognitionActivity(!mSwitch.isChecked());
+            }
+        });
+        final ClipboardManager myClipboard;
+        myClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+
+        copy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipData myClip;
+                myClip = ClipData.newPlainText("text", text.getText());
+                myClipboard.setPrimaryClip(myClip);
+                Toast.makeText(Speech2TextActivity.this, "متن در کلیپ بورد ذخیره شد", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text.getText().clear();
             }
         });
     }
@@ -69,16 +93,17 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
         en = findViewById(R.id.en_tv);
         text = findViewById(R.id.speech_et);
         partial = findViewById(R.id.partial_result);
-        copy = findViewById(R.id.copy);
+        copy = findViewById(R.id.copy_tv);
+        clear = findViewById(R.id.clear_tv);
         button = findViewById(R.id.imageView);
         recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        prefs = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
     }
 
     @Override
     public void onReadyForSpeech(Bundle params) {
-//        Toast.makeText(this, "!!بگو! دارم یادداشت میکنم", Toast.LENGTH_SHORT).show();
         partial.setVisibility(View.VISIBLE);
-        partial.setText("بگو دارم یادداشت میکنم!!");
+        partial.setText("بگو! دارم یادداشت میکنم!!");
     }
 
     @Override
@@ -118,6 +143,7 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
         };
         mHandler.post(r);
     }
+
     @Override
     public void onPartialResults(final Bundle partialResults) {
         mHandler = new Handler();
@@ -133,11 +159,9 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
 
     @Override
     public void onEvent(int eventType, Bundle params) {
-
     }
 
     public void startVoiceRecognitionActivity(boolean persian) {
-        Log.d("tag", "startVoiceRecognitionActivity: OK");
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa");
@@ -148,12 +172,7 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en");
         }
 
-//        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 100);
-//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 100);
-
         recognizer.setRecognitionListener(this);
         recognizer.startListening(intent);
-
     }
 }

@@ -5,23 +5,27 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.act.voicecommand.Dialog.VoiceDialog;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class VoiceWidget extends AppWidgetProvider {
+  public static int id;
 
   static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                               int appWidgetId) {
 
+    id = appWidgetId;
     // Construct the RemoteViews object
     RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.voice_widget);
 
-
+    Log.d(TAG, "updateAppWidget: " + appWidgetId);
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views);
 
@@ -29,7 +33,7 @@ public class VoiceWidget extends AppWidgetProvider {
     // In widget we are not allowing to use intents as usually. We have to use PendingIntent instead of 'startActivity'
     PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
     // Here the basic operations the remote view can do.
-    views.setOnClickPendingIntent(R.id.button, pendingIntent);
+    views.setOnClickPendingIntent(R.id.widgetButton, pendingIntent);
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views);
   }
@@ -50,6 +54,11 @@ public class VoiceWidget extends AppWidgetProvider {
   @Override
   public void onDisabled(Context context) {
     // Enter relevant functionality for when the last widget is disabled
+  }
+
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    super.onReceive(context, intent);
   }
 }
 

@@ -38,4 +38,5 @@ dependencies {
     implementation 'com.narayanacharya:WaveView:0.9.3'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.rm:rmswitch:1.2.2'
+    implementation 'com.sdsmdg.tastytoast:tastytoast:0.1.1'
 }

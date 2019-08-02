@@ -4,7 +4,10 @@ package com.act.voicecommand;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
@@ -17,14 +20,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
     private static final String TAG = "TEST";
     public List<String> texts;
     public List<String> icons;
+    public List<Drawable> drawableList;
     public Byte condition;
+
     String textMessage;
     Context mContext;
 
@@ -36,68 +40,87 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
         this.textMessage = textMessage;
     }
 
+ public RecAdapter(Context context, Byte condition, List<String> texts, List<Drawable> drawables) {
+        mContext = context;
+        this.texts = texts;
+        this.condition = condition;
+        drawableList = drawables;
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.custom_rec, parent, false);
         return new MyViewHolder(v);
     }
-
+//change
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         holder.tv.setText(texts.get(position));
-
-        switch (icons.get(position)) {
-            case "temp":
-                holder.iv.setBackgroundResource(R.drawable.temp);
-                break;
-            case "max":
-                holder.iv.setBackgroundResource(R.drawable.hightemp);
-                break;
-            case "min":
-                holder.iv.setBackgroundResource(R.drawable.lowtemp);
-                break;
-            case "wind":
-                holder.iv.setBackgroundResource(R.drawable.windspeed);
-                break;
-            case "cloudy":
-                holder.iv.setBackgroundResource(R.drawable.cloudy);
-                break;
-            case "contact":
-                holder.iv.setBackgroundResource(R.drawable.contact);
-                break;
-            case "left":
-                holder.iv.setBackgroundResource(R.drawable.left);
-                break;
-            case "right":
-                holder.iv.setBackgroundResource(R.drawable.right);
-                break;
-            case "sms":
-                holder.iv.setBackgroundResource(R.drawable.sms);
-                break;
-            case "evening":
-                holder.iv.setBackgroundResource(R.drawable.evening);
-                break;
-            case "midnight":
-                holder.iv.setBackgroundResource(R.drawable.midnight);
-                break;
-            case "noon":
-                holder.iv.setBackgroundResource(R.drawable.noon);
-                break;
-            case "morning":
-                holder.iv.setBackgroundResource(R.drawable.morning);
-                break;
-            case "sunset":
-                holder.iv.setBackgroundResource(R.drawable.sunset);
-                break;
-            case "sunrise":
-                holder.iv.setBackgroundResource(R.drawable.sunrise);
-                break;
-//            case "translate":
-//                holder.iv.setBackgroundResource(R.drawable.translate);
-//                break;
+        if (icons == null){
+            holder.iv.setImageDrawable(drawableList.get(position));
+            holder.iv.setImageDrawable(drawableList.get(position));
+            holder.iv.setImageDrawable(drawableList.get(position));
+//            Toast.makeText(mContext, "icons is null", Toast.LENGTH_SHORT).show();
+//            holder.iv.set
+        } else {
+            switch (icons.get(position)) {
+                case "temp":
+                    holder.iv.setBackgroundResource(R.drawable.temp);
+                    break;
+                case "max":
+                    holder.iv.setBackgroundResource(R.drawable.hightemp);
+                    break;
+                case "min":
+                    holder.iv.setBackgroundResource(R.drawable.lowtemp);
+                    break;
+                case "wind":
+                    holder.iv.setBackgroundResource(R.drawable.windspeed);
+                    break;
+                case "cloudy":
+                    holder.iv.setBackgroundResource(R.drawable.cloudy);
+                    break;
+                case "contact":
+                    holder.iv.setBackgroundResource(R.drawable.contact);
+                    break;
+                case "left":
+                    holder.iv.setBackgroundResource(R.drawable.left);
+                    break;
+                case "right":
+                    holder.iv.setBackgroundResource(R.drawable.right);
+                    break;
+                case "sms":
+                    holder.iv.setBackgroundResource(R.drawable.sms);
+                    break;
+                case "evening":
+                    holder.iv.setBackgroundResource(R.drawable.evening);
+                    break;
+                case "midnight":
+                    holder.iv.setBackgroundResource(R.drawable.midnight);
+                    break;
+                case "noon":
+                    holder.iv.setBackgroundResource(R.drawable.noon);
+                    break;
+                case "morning":
+                    holder.iv.setBackgroundResource(R.drawable.morning);
+                    break;
+                case "sunset":
+                    holder.iv.setBackgroundResource(R.drawable.sunset);
+                    break;
+                case "sunrise":
+                    holder.iv.setBackgroundResource(R.drawable.sunrise);
+                    break;
+                case "translate":
+                    holder.iv.setBackgroundResource(R.drawable.translate);
+                    break;
+                case "calculator":
+                    holder.iv.setBackgroundResource(R.drawable.calculator);
+                    break;
+                default:
+                    break;
+            }
         }
-
+//change
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,11 +136,11 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                     String text = null;
                     String contactName = holder.tv.getText().toString();
                     for (int i = 0; i < contactName.length(); i++) {
-                        if (contactName.charAt(i) == ' '){
+                        if (contactName.charAt(i) == ' ') {
                             count++;
                         }
                     }
-                    if (count == 1){
+                    if (count == 1) {
                         String[] separated = textMessage.split(" ", 3);
                         text = separated[2];
                     } else {
@@ -130,6 +153,18 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                     smsIntent.putExtra("sms_body", text);
                     mContext.startActivity(smsIntent);
                     ((BaseActivity) mContext).finish();
+                } else if (condition == 3) {
+                    String appName = holder.tv.getText().toString();
+                    MyDatabase myDatabase = new MyDatabase(mContext);
+                    SQLiteDatabase db = myDatabase.getReadableDatabase();
+                    Cursor cursor = db.rawQuery("Select * from apps where name = ?", new String[]{appName});
+                    cursor.moveToFirst();
+                    Intent launchIntent = mContext.getPackageManager()
+                            .getLaunchIntentForPackage(cursor.getString(1));
+                    if (launchIntent != null) {
+                        mContext.startActivity(launchIntent);//null pointer check in case package name was not found
+                    }
+                    cursor.close();
                 }
             }
         });
@@ -167,7 +202,7 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                 Toast.makeText(mContext, "شماره پیدا نشد", Toast.LENGTH_LONG).show();
             }
         }
-            return phoneNumber;
+        return phoneNumber;
     }
 
     private void call(String phone) {

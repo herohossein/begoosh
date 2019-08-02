@@ -1,9 +1,12 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Activities;
 
 import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.R;
 
 public class AboutActivity extends BaseActivity {
     TextView tv1;

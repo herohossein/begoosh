@@ -1,4 +1,4 @@
-package com.act.voicecommand;
+package com.act.voicecommand.Activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.R;
 
 public class SupportActivity extends BaseActivity {
 

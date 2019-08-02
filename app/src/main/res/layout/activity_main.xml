@@ -7,7 +7,8 @@
     android:background="#E4E4E4"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:layoutDirection="rtl"
+    tools:context=".Activities.MainActivity">
 
     <LinearLayout
         android:id="@+id/action_bar"
