@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.CommandAction;
 import com.act.voicecommand.R;
 import com.rm.rmswitch.RMSwitch;
 
@@ -34,6 +35,7 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
     ImageView button;
     Handler mHandler;
     SharedPreferences prefs = null;
+    ClipboardManager myClipboard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +68,8 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
                 startVoiceRecognitionActivity(!mSwitch.isChecked());
             }
         });
-        final ClipboardManager myClipboard;
-        myClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+
+        myClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
         copy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +87,11 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
                 text.getText().clear();
             }
         });
+
+        Intent i = getIntent();
+        if (i.getBooleanExtra(CommandAction.TYPE, false)) {
+            button.performClick();
+        }
     }
 
     private void init() {
@@ -135,10 +142,55 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
     public void onResults(final Bundle results) {
         mHandler = new Handler();
         partial.setVisibility(View.GONE);
+        final String[] getText = {Objects.requireNonNull(results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)).get(0)};
         final Runnable r = new Runnable() {
             @Override
             public void run() {
-                text.append(Objects.requireNonNull(results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)).get(0).concat(" "));
+                if (getText[0].contains("خط بعدی")) {
+                    getText[0] = getText[0].replace("خط بعدی ", "\n").concat(" ");
+                }
+                if (getText[0].contains("نقطه")) {
+                    getText[0] = getText[0].replace("نقطه ", ".").concat(" ");
+                }
+                if (getText[0].contains("نقطه ویرگول")) {
+                    getText[0] = getText[0].replace("نقطه ویرگول ", "؛").concat(" ");
+                }
+                if (getText[0].contains("علامت تعجب")) {
+                    getText[0] = getText[0].replace("علامت تعجب ", "!").concat(" ");
+                }
+                if (getText[0].contains("علامت سوال")) {
+                    getText[0] = getText[0].replace("علامت سوال ", "؟").concat(" ");
+                }
+                if (getText[0].contains("ویرگول")) {
+                    getText[0] = getText[0].replace("ویرگول ", "،").concat(" ");
+                }
+                if (getText[0].contains("پرانتز باز")) {
+                    getText[0] = getText[0].replace("پرانتز باز ", ")").concat(" ");
+                }
+                if (getText[0].contains("پرانتز بسته")) {
+                    getText[0] = getText[0].replace("پرانتز بسته ", "(").concat(" ");
+                }
+                if (getText[0].contains("فاصله")) {
+                    getText[0] = getText[0].replace("فاصله ", " ");
+                }
+                if (getText[0].contains("متن") && getText[0].contains("کپی")) {
+                    ClipData myClip;
+                    myClip = ClipData.newPlainText("text", text.getText());
+                    myClipboard.setPrimaryClip(myClip);
+                    Toast.makeText(Speech2TextActivity.this, "متن در کلیپ بورد ذخیره شد", Toast.LENGTH_LONG).show();
+                }
+                if (getText[0].contains("اشتراک گذاری متن")) {
+                    Intent intent;
+                    intent = new Intent(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_TEXT, text.getText().toString());
+                    intent.setType("text/plain");
+                    startActivity(Intent.createChooser(intent, "لطفا برای اشتراک گذاری متن یکی از گزینه های زیر را انتخاب کنید :"));
+                    getText[0] = getText[0].replace("اشتراک گذاری متن", "").concat(" ");
+                }
+                if (getText[0].contains("پاک") && getText[0].contains("متن")) {
+                    text.getText().clear();
+                } else
+                    text.append(getText[0].concat(" "));
             }
         };
         mHandler.post(r);

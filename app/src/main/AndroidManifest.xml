@@ -38,7 +38,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".Activities.Purchase">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="app" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Activities.Speech2TextActivity" />
         <activity android:name=".Activities.TutorialActivity" />
         <activity
@@ -63,7 +72,7 @@
             android:finishOnTaskLaunch="false"
             android:theme="@style/myTheme" />
         <activity android:name=".Activities.MainActivity" />
-
+        <activity android:name=".Activities.HelpUsActivity" />
         <receiver android:name=".VoiceWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

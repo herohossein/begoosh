@@ -12,14 +12,15 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.act.voicecommand.ApiService.ApiClient;
 import com.act.voicecommand.ApiService.ApiInterface;
@@ -34,6 +35,7 @@ import com.act.voicecommand.RecAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -112,6 +114,7 @@ public class MyCustomDialogPrayer extends BaseActivity {
                 finish();
             }
         });
+
 
         rightButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,7 +259,8 @@ public class MyCustomDialogPrayer extends BaseActivity {
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
                         showPrayTime(" ", latitude, longitude);
-                    }
+                    } else
+                        TastyToast.makeText(MyCustomDialogPrayer.this, "متاسفانه نمیتونم شهرت رو پیدا کنم لطفا همراه با دستور اسم شهرت هم بگو", TastyToast.LENGTH_LONG, TastyToast.ERROR).show();
                 }
             });
         } else {
@@ -277,7 +281,8 @@ public class MyCustomDialogPrayer extends BaseActivity {
                                         latitude = location.getLatitude();
                                         longitude = location.getLongitude();
                                         showPrayTime(" ", latitude, longitude);
-                                    }
+                                    } else
+                                        TastyToast.makeText(MyCustomDialogPrayer.this, "متاسفانه نمیتونم شهرت رو پیدا کنم لطفا همراه با دستور اسم شهرت هم بگو", TastyToast.LENGTH_LONG, TastyToast.ERROR).show();
                                 }
                             });
                         }

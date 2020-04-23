@@ -1,231 +1,157 @@
 package com.act.voicecommand.Activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.speech.SpeechRecognizer;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.RequiresApi;
+
 import com.act.voicecommand.BaseActivity;
+import com.act.voicecommand.CommandAction;
+import com.act.voicecommand.Dialog.VoiceDialog;
 import com.act.voicecommand.MyDatabase;
 import com.act.voicecommand.R;
-import com.act.voicecommand.Dialog.VoiceDialog;
 
 import java.util.List;
 
 
 public class MainActivity extends BaseActivity {
 
-public int mainCounter = 100;
-private static final String TAG = "MainActivity";
-private static final int PERMISSIONS_REQUEST_ALL_PERMISSIONS = 1;
-public ImageView voiceBtn;
-public ImageView tutorialIv;
-public ImageView aboutIv;
-public ImageView supportIv;
-public ImageView typeIv;
-public ImageView promoteIv;
-SharedPreferences prefs = null;
-SpeechRecognizer recognizer;
+    private static final String TAG = "mainActivity";
+    public int mainCounter = 100;
+    public ImageView voiceBtn;
+    public ImageView tutorialIv;
+    public ImageView aboutIv;
+    public ImageView supportIv;
+    public ImageView typeIv;
+    public ImageView promoteIv;
+    SharedPreferences prefs = null;
+    SpeechRecognizer recognizer;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
-@Override
-public void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
-	setContentView(R.layout.activity_main);
-	this.setFinishOnTouchOutside(false);
-	init();
-	
-	recognizer = SpeechRecognizer.createSpeechRecognizer(this);
-	
-	
-	
-	if (needPermissions(this)) {
-		requestPermissions();
-	} else {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        this.setFinishOnTouchOutside(false);
+        init();
 
-		//            List<String> list = new ArrayList<>();
-		//            list.add("تماس با مامان جون");
-		//            commandAction = new CommandAction(this, list);
-		//            commandAction.callCommand();
-	}
+        recognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
-//	boolean isFirstTime = Utils.isFirstTime(this);
-//	if (isFirstTime) {
-//
-//	}
-	
-	tutorialIv.setOnClickListener(new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			
-			Intent i = new Intent(getApplicationContext(), TutorialActivity.class);
-			startActivity(i);
-			
-		}
-	});
-	
-	aboutIv.setOnClickListener(new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			
-			Intent i = new Intent(getApplicationContext(), AboutActivity.class);
-			startActivity(i);
-			
-		}
-	});
-	
-	supportIv.setOnClickListener(new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			
-			Intent i = new Intent(getApplicationContext(), SupportActivity.class);
-			startActivity(i);
-		}
-	});
-	typeIv.setOnClickListener(new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			
-			Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
-			startActivity(i);
-		}
-	});
-	promoteIv.setOnClickListener(new View.OnClickListener() {
-		@Override
-		public void onClick(View view) {
-		
-//			Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
-//			startActivity(i);
+        tutorialIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), TutorialActivity.class);
+                startActivity(i);
+
+            }
+        });
+
+        aboutIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(i);
+
+            }
+        });
+
+        supportIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), SupportActivity.class);
+                startActivity(i);
+            }
+        });
+        typeIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), Speech2TextActivity.class);
+                startActivity(i);
+            }
+        });
+        promoteIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), HelpUsActivity.class);
+                startActivity(i);
 //			TastyToast.makeText(getApplicationContext(), "Hello World !", TastyToast.LENGTH_LONG, TastyToast.INFO);
-		}
-	});
-	
-}
-
-public void init() {
-	voiceBtn = findViewById(R.id.voicebtn);
-	tutorialIv = findViewById(R.id.tutorial_iv);
-	aboutIv = findViewById(R.id.about_iv);
-	supportIv = findViewById(R.id.support_iv);
-	typeIv = findViewById(R.id.type_iv);
-	promoteIv = findViewById(R.id.promote_iv);
-	prefs = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
-}
+            }
+        });
+    }
 
 
-public void onClick(View v) {
-	// TODO Auto-generated method stub
-	
-	if (mainCounter <= 100 && mainCounter > 0) {
-		//            Log.d("tag", "onClick: OK");
-		//        startVoiceRecognitionActivity();
-		mainCounter--;
-		if (mainCounter == 97) {
-			AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-			alertDialog.setTitle("یه پیشنهاد جالب!");
-			alertDialog.setMessage("می\u200Cدونستی که می\u200Cتونی همین الان ویجت «به\u200Cگوش» رو روی صفحه اصلی گوشیت بذاری تا سریع و آسون بهش دسترسی داشته باشی؟");
-			alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, " باشه!",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							Intent i = new Intent(getApplicationContext(), VoiceDialog.class);
-							startActivity(i);
-						}
-					});
-			alertDialog.show();
-		} else {
-			Intent i = new Intent(this, VoiceDialog.class);
-			startActivity(i);
-		}
-	} else if (mainCounter <= 0) {
-		AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-		alertDialog.setTitle("متاسفم!");
-		alertDialog.setMessage("برای ادامه استفاده از به گوش، باید اونو ارتقا بدی!");
-		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "ارتقا بده!",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-		alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, " نه نمیخوام!",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-		alertDialog.show();
-	}
-	
-}
-
-//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//    return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-//                   != PackageManager.PERMISSION_GRANTED;}
-
-//String[] permissions = new String[]{
-//        /*Manifest.permission.CALL_PHONE,
-//		Manifest.permission.READ_CONTACTS,
-//		Manifest.permission.CAMERA,
-//		Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//		Manifest.permission.SEND_SMS,
-//		Manifest.permission.WRITE_CALENDAR,
-//		Manifest.permission.READ_CALENDAR,*/
-//        Manifest.permission.RECORD_AUDIO};
-//requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
+    public void init() {
+        voiceBtn = findViewById(R.id.voicebtn);
+        tutorialIv = findViewById(R.id.tutorial_iv);
+        aboutIv = findViewById(R.id.about_iv);
+        supportIv = findViewById(R.id.support_iv);
+        typeIv = findViewById(R.id.type_iv);
+        promoteIv = findViewById(R.id.promote_iv);
+        prefs = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
+    }
 
 
-static public boolean needPermissions(Activity activity) {
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		return activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-				       != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-						          != PackageManager.PERMISSION_GRANTED;
+    public void onClick(View v) {
+        // TODO Auto-generated method stub
 
-		        /*Manifest.permission.CALL_PHONE)
-				       != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.CAMERA)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.SEND_SMS)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.WRITE_CALENDAR)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission(Manifest.permission.READ_CALENDAR)
-						          != PackageManager.PERMISSION_GRANTED
-				       || activity.checkSelfPermission*/
-	}
-	return false;
-}
+        if (mainCounter <= 100 && mainCounter > 0) {
+            //            Log.d("tag", "onClick: OK");
+            //        startVoiceRecognitionActivity();
+            mainCounter--;
+            if (mainCounter == 97) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("یه پیشنهاد جالب!");
+                alertDialog.setMessage("می\u200Cدونستی که می\u200Cتونی همین الان ویجت «به\u200Cگوش» رو روی صفحه اصلی گوشیت بذاری تا سریع و آسون بهش دسترسی داشته باشی؟");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, " باشه!",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                Intent i = new Intent(getApplicationContext(), VoiceDialog.class);
+                                startActivity(i);
+                            }
+                        });
+                alertDialog.show();
+            } else {
+                Intent i = new Intent(this, VoiceDialog.class);
+                startActivity(i);
+            }
+//        } else if (mainCounter <= 0) {
+//            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+//            alertDialog.setTitle("متاسفم!");
+//            alertDialog.setMessage("برای ادامه استفاده از به گوش، باید اونو ارتقا بدی!");
+//            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "ارتقا بده!",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.dismiss();
+//                        }
+//                    });
+//            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, " نه نمیخوام!",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.dismiss();
+//                        }
+//                    });
+//            alertDialog.show();
+        }
 
-@RequiresApi(api = Build.VERSION_CODES.M)
-private void requestPermissions() {
-	String[] permissions = new String[]{
-			/*Manifest.permission.CALL_PHONE,
-			Manifest.permission.READ_CONTACTS,
-			Manifest.permission.CAMERA,
-			Manifest.permission.SEND_SMS,
-			Manifest.permission.WRITE_CALENDAR,
-			Manifest.permission.READ_CALENDAR,*/
-			Manifest.permission.WRITE_EXTERNAL_STORAGE,
-			Manifest.permission.RECORD_AUDIO};
-	requestPermissions(permissions, PERMISSIONS_REQUEST_ALL_PERMISSIONS);
-}
+    }
 
 //    private void displayLocationSettingsRequest(Context context) {
 //        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
@@ -268,55 +194,66 @@ private void requestPermissions() {
 //        });
 //    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-@Override
-public boolean onKeyDown(int keyCode, KeyEvent event) {
-	
-	switch (keyCode) {
-		case KeyEvent.KEYCODE_HEADSETHOOK: {
-			voiceBtn.performClick();
-			Log.d(TAG, "onKeyDown: " + "hi");
-			//your Action code
-			return true;
-		}
-	}
-	return super.onKeyDown(keyCode, event);
-}
+        if (prefs.getBoolean("firstrun", true)) {
+            getStateContact();
 
-//change
-@Override
-protected void onResume() {
-	super.onResume();
-	
-	if (prefs.getBoolean("firstrun", true)) {
-		MyDatabase myDatabase;
-		SQLiteDatabase sqLiteDatabase;
-		myDatabase = new MyDatabase(getApplicationContext());
-		sqLiteDatabase = myDatabase.getReadableDatabase();
-		String temp;
-		String temp2;
-		Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-		mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		List<ResolveInfo> pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
-		for (int i = 0; i < pkgAppsList.size(); i++) {
-			temp = pkgAppsList.get(i).loadLabel(getPackageManager()).toString();
-			temp2 = pkgAppsList.get(i).activityInfo.packageName;
-			
-			sqLiteDatabase.execSQL("insert into apps (name, package) values ('" + temp + "', '" + temp2 + "')");
-		}
-		prefs.edit().putBoolean("firstrun", false).apply();
-	}
-}
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+//                getStateContact();
+//            }
 
-//	public ArrayList<String> getAllAppName() {
-//		List<PackageInfo> apps = getPackageManager().getInstalledPackages(0);
+            MyDatabase myDatabase;
+            SQLiteDatabase sqLiteDatabase;
+            myDatabase = new MyDatabase(getApplicationContext());
+            sqLiteDatabase = myDatabase.getReadableDatabase();
+            String temp;
+            String temp2;
+            Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            List<ResolveInfo> pkgAppsList = getPackageManager().queryIntentActivities(mainIntent, 0);
+            for (int i = 0; i < pkgAppsList.size(); i++) {
+                temp = pkgAppsList.get(i).loadLabel(getPackageManager()).toString();
+                temp2 = pkgAppsList.get(i).activityInfo.packageName;
+
+                sqLiteDatabase.execSQL("insert into apps (name, package) values ('" + temp + "', '" + temp2 + "')");
+            }
+            prefs.edit().putBoolean("firstrun", false).apply();
+        }
+    }
+
+
+    private void getStateContact() {
+        int temp = 0, temp2 = 0;
+        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+                new String[]{ContactsContract.Contacts.DISPLAY_NAME},
+                null, null, null);
+        assert cursor != null;
+        while (cursor.moveToNext()) {
+            temp++;
+            Log.d(TAG, "getStateContact: " + cursor.getString(0));
+            if (cursor.getString(0) != null) {
+                if (CommandAction.textPersian(cursor.getString(0).charAt(0))) {
+                    temp2++;
+                }
+            }
+        }
+        cursor.close();
+        if (temp == temp2) {
+            prefs.edit().putBoolean("contact_state", true).apply();
+        }
+    }
 //
-//		ArrayList<String> res = new ArrayList<>();
-//		for (int i = 0; i < apps.size(); i++) {
-//			PackageInfo p = apps.get(i);
-//			res.add(p.applicationInfo.loadLabel(getPackageManager()).toString());
-//		}
-//		return res;
-//	}
-	
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        Log.e(TAG, "onRequestPermissionsResult: " + requestCode);
+//        switch (requestCode){
+//            case CommandAction.REQUEST_CAMERA:
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                    Log.e(TAG, "onRequestPermissionsResult: ");
+//                break;
+//        }
+//    }
 }

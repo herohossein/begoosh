@@ -4,13 +4,12 @@ package com.act.voicecommand;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
@@ -55,7 +58,7 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
     }
 //change
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.tv.setText(texts.get(position));
         if (icons == null){
             holder.iv.setImageDrawable(drawableList.get(position));
@@ -116,12 +119,19 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                 case "calculator":
                     holder.iv.setBackgroundResource(R.drawable.calculator);
                     break;
+                    case "reminder":
+                    holder.iv.setBackgroundResource(R.drawable.reminder);
+                    break;
+                    case "check":
+                    holder.iv.setBackgroundResource(R.drawable.check);
+                    break;
                 default:
                     break;
             }
         }
 //change
         holder.item.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
                 if (condition == 1) {
@@ -133,7 +143,7 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                 } else if (condition == 2) {
                     //This is item for SMS
                     byte count = 0;
-                    String text = null;
+                    String text;
                     String contactName = holder.tv.getText().toString();
                     for (int i = 0; i < contactName.length(); i++) {
                         if (contactName.charAt(i) == ' ') {
@@ -165,6 +175,36 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                         mContext.startActivity(launchIntent);//null pointer check in case package name was not found
                     }
                     cursor.close();
+                } else if (condition == 4){//TODO
+//                    CommandAction action = new CommandAction(mContext, )
+                    List<String> temp = new ArrayList<>();
+                    temp.add(holder.tv.getText().toString());
+                    CommandAction commandAction = new CommandAction(mContext, temp);
+                    try {
+                        if (!commandAction.messageCommand()) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                commandAction.flashLightCommand();
+                            }
+                            commandAction.cameraCommand();
+                            commandAction.callCommand();
+                            commandAction.reminderCommand();
+                            commandAction.changeWifiStateCommand();
+                            commandAction.doSilentCommand();
+                            commandAction.changeBluetoothStateCommand();
+                            commandAction.openAppCommand();
+                            commandAction.calculateCommand();
+                            commandAction.setAlarmCommand();
+                            commandAction.translateCommand();
+                            commandAction.weatherCommand();
+                            commandAction.prayerTimeCommand();
+                            commandAction.searchCommand();
+                            commandAction.typeCommand();
+                            commandAction.gap();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "hi: ");
+                    }
                 }
             }
         });
@@ -191,8 +231,8 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
             if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                 Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+                assert pCur != null;
                 if (pCur.moveToFirst()) {
-                    assert pCur != null;
                     phoneNumber = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     Log.d(TAG, "getPhoneNumber: " + phoneNumber);
                 } else {

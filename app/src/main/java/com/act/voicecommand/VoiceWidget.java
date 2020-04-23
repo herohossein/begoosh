@@ -10,7 +10,8 @@ import android.widget.RemoteViews;
 
 import com.act.voicecommand.Dialog.VoiceDialog;
 
-import static android.support.constraint.Constraints.TAG;
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 
 /**
  * Implementation of App Widget functionality.

@@ -2,6 +2,8 @@ package com.act.voicecommand.Dialog;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -10,17 +12,20 @@ import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.act.voicecommand.CommandAction;
 import com.act.voicecommand.R;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -32,6 +37,7 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
     private static final String TAG = "VoiceDialog";
     CommandAction commandAction;
     TextView tv;
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,13 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
         recognizer = SpeechRecognizer.createSpeechRecognizer(this);
         startVoiceRecognitionActivity();
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Window window = this.getWindow();
+//        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+//                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+        pref = getSharedPreferences("com.act.voicecommand", MODE_PRIVATE);
     }
 
 
@@ -53,13 +66,8 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa");
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-//        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, Integer.valueOf(2));
-//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, Integer.valueOf(100));
-//        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, Integer.valueOf(100));
-
         recognizer.setRecognitionListener(this);
         recognizer.startListening(intent);
-
     }
 
     @Override
@@ -123,44 +131,91 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
                 Toast.makeText(this, "اینترنت در دسترس نیست!", Toast.LENGTH_LONG).show();
                 finish();
                 break;
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
+            case SpeechRecognizer.ERROR_SERVER:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
+            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                Toast.makeText(this, "متوجه نشدم دوباره امتحان کن!", Toast.LENGTH_LONG).show();
+                break;
             default:
                 Toast.makeText(this, "ببخشید مشکلی رخ داده!", Toast.LENGTH_LONG).show();
-                finish();
         }
+        finish();
     }
+
+    ArrayList<String> matches;
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onResults(final Bundle results) {
         Log.d(TAG, "onResults: " + results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION));
 
-        List<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
+        setCommand();
 
-        commandAction = new CommandAction(this, matches);
-
-        if (!commandAction.messageCommand()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                commandAction.flashLightCommand();
-            }
-            commandAction.cameraCommand();
-            commandAction.callCommand();
-            commandAction.reminderCommand();
-            commandAction.changeWifiStateCommand();
-            commandAction.doSilentCommand();
-            commandAction.changeBluetoothStateCommand();
-            commandAction.openAppCommand();
-            commandAction.calculateCommand();
-            commandAction.setAlarmCommand();
-            commandAction.translateCommand();
-            commandAction.weatherCommand();
-            commandAction.prayerTimeCommand();
-            commandAction.gap();
+        if (!pref.getBoolean("perState", false)) {
+            this.finish();
         }
 
-       this.finish();
-
         recognizer.destroy();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void setCommand() {
+
+        commandAction = new CommandAction(this, matches);
+        try {
+            if (!commandAction.messageCommand()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    commandAction.flashLightCommand();
+                }
+                commandAction.cameraCommand();
+                commandAction.callCommand();
+                commandAction.reminderCommand();
+                commandAction.changeWifiStateCommand();
+                commandAction.doSilentCommand();
+                commandAction.changeBluetoothStateCommand();
+                commandAction.openAppCommand();
+                commandAction.calculateCommand();
+                commandAction.setAlarmCommand();
+                commandAction.translateCommand();
+                commandAction.weatherCommand();
+                commandAction.prayerTimeCommand();
+                commandAction.searchCommand();
+                commandAction.typeCommand();
+                commandAction.gap();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "hi: ");
+            ArrayList<String> icons = new ArrayList<>();
+            assert matches != null;
+            for (int i = 0; i < matches.size(); i++) {
+                icons.add("check");
+            }
+            Intent i = new Intent(VoiceDialog.this, MyCustomDialog.class);
+            i.putExtra(CommandAction.TITLE, "دستورت رو متجه نشدم!! لطفا دستور درست رو انتخاب کن...");
+            i.putStringArrayListExtra(CommandAction.TEXT, matches);
+            i.putStringArrayListExtra(CommandAction.ICONS, icons);
+            i.putExtra(CommandAction.CONDITION, 4);
+            startActivity(i);
+        }
+
     }
 
     @Override
@@ -188,5 +243,36 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.e(TAG, "onRequestPermissionsResult: " + requestCode);
+        switch (requestCode) {
+            case CommandAction.REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    setCommand();
+                break;
 
+            case CommandAction.REQUEST_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    setCommand();
+                break;
+
+            case CommandAction.REQUEST_CALENDAR:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    setCommand();
+                break;
+
+            case CommandAction.REQUEST_PHONE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    setCommand();
+                break;
+
+            case CommandAction.REQUEST_SMS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    setCommand();
+                break;
+        }
+        this.finish();
+    }
 }
