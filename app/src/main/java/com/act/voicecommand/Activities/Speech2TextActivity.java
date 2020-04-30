@@ -170,9 +170,9 @@ public class Speech2TextActivity extends BaseActivity implements RecognitionList
                 if (getText[0].contains("پرانتز بسته")) {
                     getText[0] = getText[0].replace("پرانتز بسته ", "(").concat(" ");
                 }
-                if (getText[0].contains("فاصله")) {
-                    getText[0] = getText[0].replace("فاصله ", " ");
-                }
+//                if (getText[0].contains("فاصله")) {
+//                    getText[0] = getText[0].replace("فاصله ", " ");
+//                }
                 if (getText[0].contains("متن") && getText[0].contains("کپی")) {
                     ClipData myClip;
                     myClip = ClipData.newPlainText("text", text.getText());

@@ -181,7 +181,7 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.MyViewHolder> {
                     temp.add(holder.tv.getText().toString());
                     CommandAction commandAction = new CommandAction(mContext, temp);
                     try {
-                        if (!commandAction.messageCommand()) {
+                        if (commandAction.messageCommand()) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 commandAction.flashLightCommand();
                             }

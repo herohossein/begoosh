@@ -36,7 +36,6 @@ import com.act.voicecommand.ApiService.ApiInterface;
 import com.act.voicecommand.Calendar.ChangeDate;
 import com.act.voicecommand.Dialog.MyCustomDialog;
 import com.act.voicecommand.Dialog.MyCustomDialogPrayer;
-import com.act.voicecommand.Dialog.VoiceDialog;
 import com.act.voicecommand.Weather.WeatherResponse;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -78,9 +77,9 @@ public class CommandAction {
     public static final int REQUEST_CAMERA = 1301;
     public static final int REQUEST_SMS = 1302;
     public static final int REQUEST_PHONE = 1303;
-    public static final int REQUEST_CONTACT = 1304;
+    //    public static final int REQUEST_CONTACT = 1304;
     public static final int REQUEST_CALENDAR = 1305;
-    public static final int REQUEST_AUDIO = 1306;
+    //    public static final int REQUEST_AUDIO = 1306;
     public static final int REQUEST_LOCATION = 1307;
 
 
@@ -97,6 +96,7 @@ public class CommandAction {
         pref = this.context.getSharedPreferences("com.act.voicecommand", Context.MODE_PRIVATE);
     }
 
+    //OK
     public void gap() {
         int random = new Random().nextInt(4) + 1;
         if (command.get(0).equals("سلام") || command.get(0).equals("درود")) {
@@ -193,6 +193,7 @@ public class CommandAction {
         }
     }
 
+    //OK
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void flashLightCommand() {
 
@@ -221,6 +222,7 @@ public class CommandAction {
         }
     }
 
+    //OK
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void cameraCommand() {
         if (command.get(0).contains("دوربین") || (command.get(0).contains("عکس") && command.get(0).contains("بگیر"))) {
@@ -234,6 +236,7 @@ public class CommandAction {
         }
     }
 
+    //SAJJAD NO OK
     public void callCommand() {
         ArrayList<String> foundedContact = new ArrayList<>();
         boolean contactState = pref.getBoolean("contact_state", false);
@@ -346,9 +349,11 @@ public class CommandAction {
         context.startActivity(intent);
     }
 
+    //OK
     public boolean messageCommand() {
         ArrayList<String> foundedContact = new ArrayList<>();
         String[] separated1 = null;
+        String[] separated2 = null;
         boolean contactState = pref.getBoolean("contact_state", false);
         if ((command.get(0).contains("پیامک") || command.get(0).contains("پیام")) && command.get(0).contains("بنویس")) {
             if (needPermissionSMS((Activity) context)) {
@@ -356,7 +361,7 @@ public class CommandAction {
             } else {
                 setPerState(false);
                 separated1 = command.get(0).split("به ");
-                String[] separated2 = separated1[1].split(" بنویس ");
+                separated2 = separated1[1].split(" بنویس ");
                 if (contactState) {
                     foundedContact = myCheckFunction(separated2[0], getArrayOfContacts(), true);
                 } else
@@ -390,7 +395,8 @@ public class CommandAction {
             Intent smsIntent = new Intent(Intent.ACTION_VIEW);
             smsIntent.setType("vnd.android-dir/mms-sms");
             smsIntent.putExtra("address", getPhoneNumber(foundedContact.get(0)));
-            smsIntent.putExtra("sms_body", separated1[1]);
+            assert separated2 != null;
+            smsIntent.putExtra("sms_body", separated2[1]);
             context.startActivity(smsIntent);
         }
 
@@ -407,9 +413,9 @@ public class CommandAction {
             i.putStringArrayListExtra(ICONS, icon);
             i.putExtra(CONDITION, Byte.valueOf("2"));
             context.startActivity(i);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public void reminderCommand() {
@@ -486,6 +492,7 @@ public class CommandAction {
         }
     }
 
+    //OK
     public void doSilentCommand() {
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if ((command.get(0).contains("قطع") && command.get(0).contains("صدا")) || command.get(0).contains("حالت بی صدا") ||
@@ -498,6 +505,7 @@ public class CommandAction {
         }
     }
 
+    //OK
     public void changeBluetoothStateCommand() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (command.get(0).contains("بلوتوث") && command.get(0).contains("روشن")) {
@@ -505,19 +513,6 @@ public class CommandAction {
         } else if (command.get(0).contains("بلوتوث") && command.get(0).contains("خاموش")) {
             bluetoothAdapter.disable();
         }
-    }
-
-    private ArrayList<String> getAllAppName() {
-        ArrayList<String> appLists = new ArrayList<>();
-        MyDatabase myDatabase = new MyDatabase(context);
-        SQLiteDatabase db = myDatabase.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select * from apps", null);
-        cursor.moveToFirst();
-        while (cursor.moveToNext()) {
-            appLists.add(cursor.getString(0));
-        }
-        cursor.close();
-        return appLists;
     }
 
     private ArrayList<String> myCheckFunction(String name, ArrayList<String> list, boolean persian) {
@@ -625,6 +620,19 @@ public class CommandAction {
                 context.startActivity(i);
             }
         }
+    }
+
+    private ArrayList<String> getAllAppName() {
+        ArrayList<String> appLists = new ArrayList<>();
+        MyDatabase myDatabase = new MyDatabase(context);
+        SQLiteDatabase db = myDatabase.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select * from apps", null);
+        cursor.moveToFirst();
+        while (cursor.moveToNext()) {
+            appLists.add(cursor.getString(0));
+        }
+        cursor.close();
+        return appLists;
     }
 
     public void setAlarmCommand() {
@@ -1389,7 +1397,7 @@ public class CommandAction {
         ActivityCompat.requestPermissions((Activity) context, new String[]{WRITE_CALENDAR, READ_CALENDAR}, REQUEST_CALENDAR);
     }
 
-    private void setPerState(Boolean state){
+    private void setPerState(Boolean state) {
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean("perState", state);
         editor.apply();

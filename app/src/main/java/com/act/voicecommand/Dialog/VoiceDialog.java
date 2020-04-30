@@ -180,7 +180,7 @@ public class VoiceDialog extends AppCompatActivity implements RecognitionListene
 
         commandAction = new CommandAction(this, matches);
         try {
-            if (!commandAction.messageCommand()) {
+            if (commandAction.messageCommand()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     commandAction.flashLightCommand();
                 }
