@@ -56,7 +56,16 @@ protected void onCreate(Bundle savedInstanceState) {
 		public void onClick(View view) {
 			
 			invisible();
-			
+			inl1.setVisibility(View.VISIBLE);
+			tv1.setText("زنگ بزن به «نام مخاطب»");
+			inl2.setVisibility(View.VISIBLE);
+			tv2.setText("تماس با «نام مخاطب»");
+			inl3.setVisibility(View.VISIBLE);
+			tv3.setText("تماس بگیر با «نام مخاطب»");
+			inl4.setVisibility(View.VISIBLE);
+			tv4.setText("زنگ به «نام مخاطب»");
+			inl5.setVisibility(View.VISIBLE);
+			tv5.setText("«نام مخاطب» رو بگیر");
 			
 		}
 	});
@@ -71,6 +80,10 @@ protected void onCreate(Bundle savedInstanceState) {
 			tv1.setText("پیام به «نام مخاطب» بنویس «متن پیام»");
 			inl2.setVisibility(View.VISIBLE);
 			tv2.setText("پیامک به «نام مخاطب» بنویس «متن پیام»");
+			inl3.setVisibility(View.VISIBLE);
+			tv3.setText("پیام به «نام مخاطب» «متن پیام»");
+			inl4.setVisibility(View.VISIBLE);
+			tv4.setText("پیامک به «نام مخاطب» «متن پیام»");
 		}
 	});
 	

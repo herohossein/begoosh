@@ -911,7 +911,13 @@ public class CommandAction {
 //            Toast.makeText(context, String.valueOf(beginTime.get(Calendar.DAY_OF_MONTH)+dayDifference), Toast.LENGTH_SHORT).show();
             beginTime.set(beginTime.get(Calendar.YEAR), beginTime.get(Calendar.MONTH), beginTime.get(Calendar.DAY_OF_MONTH) + dayDifference);
         } else {
-            beginTime.set(Year, Month, Day);
+            int monthDifference;
+            if (Month > beginTime.get(Calendar.MONTH)) {
+                monthDifference = Month - beginTime.get(Calendar.MONTH);
+            } else {
+                monthDifference = 7 - (beginTime.get(Calendar.MONTH) - Month);
+            }
+            beginTime.set(Year, Month + monthDifference, Day);
         }
 
         long startMillis = beginTime.getTimeInMillis();
