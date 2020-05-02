@@ -1,0 +1,18 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@null"
+    android:padding="@dimen/widget_margin"
+    android:gravity="center">
+
+    <ImageButton
+        android:id="@+id/widgetButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/voice"
+        />
+
+
+</RelativeLayout>
