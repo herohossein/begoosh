@@ -573,6 +573,7 @@ public class CommandAction {
         return finalResult;
     }
 
+    //OK
     public void openAppCommand() {
         String appName;
         String temp;
